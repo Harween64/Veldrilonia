@@ -1,0 +1,6 @@
+[submodule "libs/veldrid"]
+	path = libs/veldrid
+	url = https://github.com/veldrid/veldrid.git
+[submodule "libs/Avalonia"]
+	path = libs/Avalonia
+	url = https://github.com/Harween64/Avalonia.git
