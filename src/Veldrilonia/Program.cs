@@ -31,17 +31,17 @@ public static class Program
         _window = VeldridStartup.CreateWindow(ref windowCI);
         _graphicsDevice = VeldridStartup.CreateGraphicsDevice(_window);
 
-        VertexPositionColor[] vertices =
+        VertexPositionTexture[] vertices =
         [
-            new VertexPositionColor(new Vector2(-0.5f, -0.5f), RgbaFloat.Red),
-                new VertexPositionColor(new Vector2(-0.5f, 0.5f), RgbaFloat.Green),
-                new VertexPositionColor(new Vector2(0.5f, 0.5f), RgbaFloat.Blue),
-                new VertexPositionColor(new Vector2(0.5f, -0.5f), RgbaFloat.Yellow)
+            new (new Vector2(-0.5f, -0.5f), new Vector2(0, 1)),
+            new (new Vector2(-0.5f, 0.5f), new Vector2(0, 0)),
+            new (new Vector2(0.5f, 0.5f), new Vector2(1, 0)),
+            new (new Vector2(0.5f, -0.5f), new Vector2(1, 1))
         ];
 
         // 1. On décrit le buffer (Taille + Usage)
         var bDescription = new BufferDescription(
-            (uint)(vertices.Length * Unsafe.SizeOf<VertexPositionColor>()),
+            (uint)(vertices.Length * Unsafe.SizeOf<VertexPositionTexture>()),
             BufferUsage.VertexBuffer);
 
         // 2. On demande à l'usine de créer le buffer vide sur le GPU
@@ -53,7 +53,7 @@ public static class Program
 
         ushort[] indices = [
             0, 1, 2,
-                0, 2, 3
+            0, 2, 3
         ];
 
         bDescription = new BufferDescription(
@@ -71,8 +71,8 @@ public static class Program
         string vertexCode = """
                 #version 450
                 layout(location = 0) in vec2 Position;
-                layout(location = 1) in vec4 Color;
-                layout(location = 0) out vec4 fsin_Color;
+                layout(location = 1) in vec2 TextureCoordinate;
+                layout(location = 0) out vec2 fsin_TextureCoordinate;
                 layout(set = 0, binding = 0) uniform Transformation {
                     mat4 World;
                 };
@@ -80,18 +80,22 @@ public static class Program
                 void main()
                 {
                     gl_Position = World * vec4(Position, 0, 1);
-                    fsin_Color = Color;
+                    fsin_TextureCoordinate = TextureCoordinate;
                 }
                 """;
 
         // Le code source du Fragment Shader (Le peintre)
         string fragmentCode = """
                 #version 450
-                layout(location = 0) in vec4 fsin_Color;
+                layout(location = 0) in vec2 fsin_TextureCoordinate;
                 layout(location = 0) out vec4 fsout_Color;
+
+                layout(set = 0, binding = 1) uniform texture2D SurfaceTexture;
+                layout(set = 0, binding = 2) uniform sampler SurfaceSampler;
+
                 void main()
                 {
-                    fsout_Color = fsin_Color;
+                    fsout_Color = texture(sampler2D(SurfaceTexture, SurfaceSampler), fsin_TextureCoordinate);
                 }
                 """;
         var vertexShaderDesc = new ShaderDescription(
@@ -109,23 +113,33 @@ public static class Program
         _shaders = _graphicsDevice.ResourceFactory.CreateFromSpirv(vertexShaderDesc, fragmentShaderDesc);
 
         VertexLayoutDescription vertexLayout = new VertexLayoutDescription(
-            (uint)Unsafe.SizeOf<VertexPositionColor>(),
+            (uint)Unsafe.SizeOf<VertexPositionTexture>(),
             new VertexElementDescription("Position", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float2),
-            new VertexElementDescription("Color", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float4)
+            new VertexElementDescription("TextureCoordinate", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float2)
         );
 
-        ResourceLayoutDescription layoutDescription = new ResourceLayoutDescription(
-            new ResourceLayoutElementDescription("Transformation", ResourceKind.UniformBuffer, ShaderStages.Vertex)
-        );
+        // 1. On charge les pixels depuis le fichier
+        var image = new Veldrid.ImageSharp.ImageSharpTexture("./Assets/create.png");
 
-        ResourceLayout _resourceLayout = _graphicsDevice.ResourceFactory.CreateResourceLayout(layoutDescription);
-        ResourceSetDescription setDescription = new ResourceSetDescription(_resourceLayout, _uniformBuffer);
+        // 2. On crée la texture sur la carte graphique
+        Texture _texture = image.CreateDeviceTexture(_graphicsDevice, _graphicsDevice.ResourceFactory);
+
+        // 3. On crée une "Vue" pour que le shader puisse lire la texture
+        TextureView _textureView = _graphicsDevice.ResourceFactory.CreateTextureView(_texture);
+
+
+        ResourceLayout _resourceLayout = _graphicsDevice.ResourceFactory.CreateResourceLayout(new (
+            new ResourceLayoutElementDescription("Transformation", ResourceKind.UniformBuffer, ShaderStages.Vertex),
+            new ResourceLayoutElementDescription("Texture", ResourceKind.TextureReadOnly, ShaderStages.Fragment),
+            new ResourceLayoutElementDescription("Sampler", ResourceKind.Sampler, ShaderStages.Fragment)
+        ));
+        ResourceSetDescription setDescription = new (_resourceLayout, _uniformBuffer, _textureView, _graphicsDevice.PointSampler);
         ResourceSet _resourceSet = _graphicsDevice.ResourceFactory.CreateResourceSet(setDescription);
 
         GraphicsPipelineDescription pipelineDescription = new GraphicsPipelineDescription();
 
         // 1. Comment on mélange les couleurs (ici, par défaut)
-        pipelineDescription.BlendState = BlendStateDescription.SingleOverrideBlend;
+        pipelineDescription.BlendState = BlendStateDescription.SingleAlphaBlend;
 
         // 2. La gestion de la profondeur (ici, désactivé pour 2D)
         pipelineDescription.DepthStencilState = DepthStencilStateDescription.Disabled;
@@ -168,7 +182,7 @@ public static class Program
             commandList.Begin();
             // Configuration du framebuffer et nettoyage de l'écran
             commandList.SetFramebuffer(_graphicsDevice.SwapchainFramebuffer);
-            commandList.ClearColorTarget(0, RgbaFloat.Black);
+            commandList.ClearColorTarget(0, RgbaFloat.Grey);
             commandList.SetPipeline(_pipeline);
             commandList.SetVertexBuffer(0, _vertexBuffer);
             commandList.SetIndexBuffer(_indexBuffer, IndexFormat.UInt16);
@@ -199,5 +213,10 @@ public struct VertexPositionColor(Vector2 position, RgbaFloat color)
 
 
 
-
+[StructLayout(LayoutKind.Sequential)]
+public struct VertexPositionTexture(Vector2 position, Vector2 textureCoordinate)
+{
+    public Vector2 Position = position;
+    public Vector2 TextureCoordinate = textureCoordinate;
+}
 

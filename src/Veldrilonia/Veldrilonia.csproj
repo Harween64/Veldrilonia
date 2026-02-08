@@ -16,7 +16,11 @@
     <PackageReference Include="Veldrid" Version="*" />
     <PackageReference Include="Veldrid.SDL2" Version="*" />
     <PackageReference Include="Veldrid.SPIRV" Version="*" />
+    <PackageReference Include="Veldrid.ImageSharp" Version="*" />
     <PackageReference Include="Veldrid.StartupUtilities" Version="*" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Include="Assets/**" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
 </Project>
