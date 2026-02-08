@@ -40,12 +40,12 @@ public static class Program
         ];
 
         // 1. On décrit le buffer (Taille + Usage)
-        var vbDescription = new BufferDescription(
+        var bDescription = new BufferDescription(
             (uint)(vertices.Length * Unsafe.SizeOf<VertexPositionColor>()),
             BufferUsage.VertexBuffer);
 
         // 2. On demande à l'usine de créer le buffer vide sur le GPU
-        var _vertexBuffer = _graphicsDevice.ResourceFactory.CreateBuffer(vbDescription);
+        var _vertexBuffer = _graphicsDevice.ResourceFactory.CreateBuffer(bDescription);
 
         // 3. On remplit le buffer avec nos données C#
         _graphicsDevice.UpdateBuffer(_vertexBuffer, 0, vertices);
@@ -56,11 +56,16 @@ public static class Program
                 0, 2, 3
         ];
 
-        vbDescription = new BufferDescription(
+        bDescription = new BufferDescription(
             (uint)(indices.Length * sizeof(ushort)),
             BufferUsage.IndexBuffer);
-        var _indexBuffer = _graphicsDevice.ResourceFactory.CreateBuffer(vbDescription);
+        var _indexBuffer = _graphicsDevice.ResourceFactory.CreateBuffer(bDescription);
         _graphicsDevice.UpdateBuffer(_indexBuffer, 0, indices);
+
+        Matrix4x4[] transforms = [Matrix4x4.Identity];
+        bDescription = new BufferDescription((uint)Unsafe.SizeOf<Matrix4x4>(), BufferUsage.UniformBuffer);
+        var _uniformBuffer = _graphicsDevice.ResourceFactory.CreateBuffer(bDescription);
+        _graphicsDevice.UpdateBuffer(_uniformBuffer, 0, transforms);
 
         // Le code source du Vertex Shader (L'architecte)
         string vertexCode = """
@@ -68,9 +73,13 @@ public static class Program
                 layout(location = 0) in vec2 Position;
                 layout(location = 1) in vec4 Color;
                 layout(location = 0) out vec4 fsin_Color;
+                layout(set = 0, binding = 0) uniform Transformation {
+                    mat4 World;
+                };
+
                 void main()
                 {
-                    gl_Position = vec4(Position, 0, 1);
+                    gl_Position = World * vec4(Position, 0, 1);
                     fsin_Color = Color;
                 }
                 """;
@@ -105,6 +114,14 @@ public static class Program
             new VertexElementDescription("Color", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float4)
         );
 
+        ResourceLayoutDescription layoutDescription = new ResourceLayoutDescription(
+            new ResourceLayoutElementDescription("Transformation", ResourceKind.UniformBuffer, ShaderStages.Vertex)
+        );
+
+        ResourceLayout _resourceLayout = _graphicsDevice.ResourceFactory.CreateResourceLayout(layoutDescription);
+        ResourceSetDescription setDescription = new ResourceSetDescription(_resourceLayout, _uniformBuffer);
+        ResourceSet _resourceSet = _graphicsDevice.ResourceFactory.CreateResourceSet(setDescription);
+
         GraphicsPipelineDescription pipelineDescription = new GraphicsPipelineDescription();
 
         // 1. Comment on mélange les couleurs (ici, par défaut)
@@ -126,7 +143,7 @@ public static class Program
 
         // 6. On lui dit sur quoi on dessine (la fenêtre)
         pipelineDescription.Outputs = _graphicsDevice.SwapchainFramebuffer.OutputDescription;
-        pipelineDescription.ResourceLayouts = System.Array.Empty<ResourceLayout>();
+        pipelineDescription.ResourceLayouts = [_resourceLayout];
 
         // CRÉATION DU PIPELINE
         _pipeline = _graphicsDevice.ResourceFactory.CreateGraphicsPipeline(pipelineDescription);
@@ -141,6 +158,10 @@ public static class Program
             if (!_window.Exists)
                 break;
 
+
+            var rotation = Matrix4x4.CreateRotationZ((float)Environment.TickCount / 1000f);
+            _graphicsDevice.UpdateBuffer(_uniformBuffer, 0, ref rotation);
+
             var commandList = _graphicsDevice.ResourceFactory.CreateCommandList();
 
             // Commandes de rendu
@@ -151,6 +172,7 @@ public static class Program
             commandList.SetPipeline(_pipeline);
             commandList.SetVertexBuffer(0, _vertexBuffer);
             commandList.SetIndexBuffer(_indexBuffer, IndexFormat.UInt16);
+            commandList.SetGraphicsResourceSet(0, _resourceSet);
             commandList.DrawIndexed(
                 indexCount: (uint)indices.Length,
                 instanceCount: 1,
