@@ -36,10 +36,10 @@ public static class Program
 
         VertexPositionTexture[] vertices =
         [
-            new (new Vector2(-0.5f, -0.5f), new Vector2(0, 1)),
+            new (new Vector2(-0.5f, -0.25f), new Vector2(0, 1)),
             new (new Vector2(-0.5f, 0.5f), new Vector2(0, 0)),
             new (new Vector2(0.5f, 0.5f), new Vector2(1, 0)),
-            new (new Vector2(0.5f, -0.5f), new Vector2(1, 1))
+            new (new Vector2(0.5f, -0.25f), new Vector2(1, 1))
         ];
 
         // 1. On décrit le buffer (Taille + Usage)
@@ -99,10 +99,17 @@ public static class Program
                 void main()
                 {
                     vec4 color = texture(sampler2D(SurfaceTexture, SurfaceSampler), fsin_TextureCoordinate);
-                    float dist = distance(fsin_TextureCoordinate, vec2(0.5));
-                    float alphaMask = 1.0 - smoothstep(0.49, 0.5, dist);
+                    
+                    vec2 p = abs(fsin_TextureCoordinate - 0.5);
+                    vec2 demiTaille = vec2(0.4, 0.4);
+                    vec2 distanceBord = p - demiTaille;
+                    vec2 distExterieure = max(p - demiTaille, 0.0);
+                    float alphaMask = 1.0 - smoothstep(0.09, 0.1, length(distExterieure));
+
+                    // float dist = distance(fsin_TextureCoordinate, vec2(0.5));
+                    // float alphaMask = 1.0 - smoothstep(0.49, 0.5, dist);
+
                     color.a *= alphaMask;
-    
                     fsout_Color = color;
                 }
                 """;
@@ -233,7 +240,7 @@ public static class Program
             commandList.Begin();
             // Configuration du framebuffer et nettoyage de l'écran
             commandList.SetFramebuffer(_graphicsDevice.SwapchainFramebuffer);
-            commandList.ClearColorTarget(0, RgbaFloat.Grey);
+            commandList.ClearColorTarget(0, RgbaFloat.Black);
             commandList.SetPipeline(_pipeline);
             commandList.SetVertexBuffer(0, _vertexBuffer);
             commandList.SetIndexBuffer(_indexBuffer, IndexFormat.UInt16);
