@@ -7,4 +7,15 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <!-- <ItemGroup>
+    <ProjectReference Include="..\..\libs\veldrid\src\Veldrid\Veldrid.csproj" />
+    <ProjectReference Include="..\..\libs\veldrid\src\Veldrid.SDL2\Veldrid.SDL2.csproj" />
+    <ProjectReference Include="..\..\libs\veldrid\src\Veldrid.StartupUtilities\Veldrid.StartupUtilities.csproj" />
+  </ItemGroup> -->
+  <ItemGroup>
+    <PackageReference Include="Veldrid" Version="*" />
+    <PackageReference Include="Veldrid.SDL2" Version="*" />
+    <PackageReference Include="Veldrid.StartupUtilities" Version="*" />
+  </ItemGroup>
+
 </Project>

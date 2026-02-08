@@ -1,5 +1,8 @@
 <Solution>
-  <Folder Name="/src/">
-    <Project Path="src/Veldrilonia/Veldrilonia.csproj" />
+  <Folder Name="/veldrid/">
+    <Project Path="libs/veldrid/src/Veldrid/Veldrid.csproj" />
+    <Project Path="libs/veldrid/src/Veldrid.SDL2/Veldrid.SDL2.csproj" />
+    <Project Path="libs/veldrid/src/Veldrid.StartupUtilities/Veldrid.StartupUtilities.csproj" />
   </Folder>
+  <Project DefaultStartup="true" Path="src/Veldrilonia/Veldrilonia.csproj" />
 </Solution>
