@@ -1,5 +1,10 @@
-﻿using Veldrid;
+﻿using System.Numerics;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+using System.Text;
+using Veldrid;
 using Veldrid.Sdl2;
+using Veldrid.SPIRV;
 using Veldrid.StartupUtilities;
 
 public static class Program
@@ -7,24 +12,168 @@ public static class Program
     private static GraphicsDevice _graphicsDevice;
     private static Sdl2Window _window;
 
+    private static Shader[] _shaders;
+    private static Pipeline _pipeline;
+
     public static void Main()
     {
-          // 1. Création de la configuration de la fenêtre
-          WindowCreateInfo windowCI = new WindowCreateInfo(
-               x: 100,
-               y: 100,
-               windowWidth: 960,
-               windowHeight: 540,
-               windowInitialState: WindowState.Normal,
-               windowTitle: "Mon Moteur 2D Veldrid"
-          );
+        // Création de la configuration de la fenêtre
+        WindowCreateInfo windowCI = new WindowCreateInfo(
+            x: 100,
+            y: 100,
+            windowWidth: 960,
+            windowHeight: 540,
+            windowInitialState: WindowState.Normal,
+            windowTitle: "Mon Moteur 2D Veldrid"
+        );
 
-          // 2. Création de la fenêtre et du contexte graphique
-          _window = VeldridStartup.CreateWindow(ref windowCI);
-          _graphicsDevice = VeldridStartup.CreateGraphicsDevice(_window);
+        // Création de la fenêtre et du contexte graphique
+        _window = VeldridStartup.CreateWindow(ref windowCI);
+        _graphicsDevice = VeldridStartup.CreateGraphicsDevice(_window);
+
+        VertexPositionColor[] vertices =
+        [
+            new VertexPositionColor(new Vector2(-0.5f, -0.5f), RgbaFloat.Red),
+                new VertexPositionColor(new Vector2(-0.5f, 0.5f), RgbaFloat.Green),
+                new VertexPositionColor(new Vector2(0.5f, 0.5f), RgbaFloat.Blue),
+                new VertexPositionColor(new Vector2(0.5f, -0.5f), RgbaFloat.Yellow)
+        ];
+
+        // 1. On décrit le buffer (Taille + Usage)
+        var vbDescription = new BufferDescription(
+            (uint)(vertices.Length * Unsafe.SizeOf<VertexPositionColor>()),
+            BufferUsage.VertexBuffer);
+
+        // 2. On demande à l'usine de créer le buffer vide sur le GPU
+        var _vertexBuffer = _graphicsDevice.ResourceFactory.CreateBuffer(vbDescription);
+
+        // 3. On remplit le buffer avec nos données C#
+        _graphicsDevice.UpdateBuffer(_vertexBuffer, 0, vertices);
+
+
+        ushort[] indices = [
+            0, 1, 2,
+                0, 2, 3
+        ];
+
+        vbDescription = new BufferDescription(
+            (uint)(indices.Length * sizeof(ushort)),
+            BufferUsage.IndexBuffer);
+        var _indexBuffer = _graphicsDevice.ResourceFactory.CreateBuffer(vbDescription);
+        _graphicsDevice.UpdateBuffer(_indexBuffer, 0, indices);
+
+        // Le code source du Vertex Shader (L'architecte)
+        string vertexCode = """
+                #version 450
+                layout(location = 0) in vec2 Position;
+                layout(location = 1) in vec4 Color;
+                layout(location = 0) out vec4 fsin_Color;
+                void main()
+                {
+                    gl_Position = vec4(Position, 0, 1);
+                    fsin_Color = Color;
+                }
+                """;
+
+        // Le code source du Fragment Shader (Le peintre)
+        string fragmentCode = """
+                #version 450
+                layout(location = 0) in vec4 fsin_Color;
+                layout(location = 0) out vec4 fsout_Color;
+                void main()
+                {
+                    fsout_Color = fsin_Color;
+                }
+                """;
+        var vertexShaderDesc = new ShaderDescription(
+            ShaderStages.Vertex,
+            Encoding.UTF8.GetBytes(vertexCode),
+            "main"
+        );
+        var fragmentShaderDesc = new ShaderDescription(
+            ShaderStages.Fragment,
+            Encoding.UTF8.GetBytes(fragmentCode),
+            "main"
+        );
+
+
+        _shaders = _graphicsDevice.ResourceFactory.CreateFromSpirv(vertexShaderDesc, fragmentShaderDesc);
+
+        VertexLayoutDescription vertexLayout = new VertexLayoutDescription(
+            (uint)Unsafe.SizeOf<VertexPositionColor>(),
+            new VertexElementDescription("Position", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float2),
+            new VertexElementDescription("Color", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float4)
+        );
+
+        GraphicsPipelineDescription pipelineDescription = new GraphicsPipelineDescription();
+
+        // 1. Comment on mélange les couleurs (ici, par défaut)
+        pipelineDescription.BlendState = BlendStateDescription.SingleOverrideBlend;
+
+        // 2. La gestion de la profondeur (ici, désactivé pour 2D)
+        pipelineDescription.DepthStencilState = DepthStencilStateDescription.Disabled;
+
+        // 3. Comment remplir les triangles (ici, remplissage plein, pas de fil de fer)
+        pipelineDescription.RasterizerState = RasterizerStateDescription.Default;
+
+        // 4. Notre choix de tout à l'heure !
+        pipelineDescription.PrimitiveTopology = PrimitiveTopology.TriangleList;
+
+        // 5. Nos Shaders et notre format de Vertex
+        pipelineDescription.ShaderSet = new ShaderSetDescription(
+            new[] { vertexLayout }, // Le plan de nos données
+            _shaders);              // Nos programmes
+
+        // 6. On lui dit sur quoi on dessine (la fenêtre)
+        pipelineDescription.Outputs = _graphicsDevice.SwapchainFramebuffer.OutputDescription;
+        pipelineDescription.ResourceLayouts = System.Array.Empty<ResourceLayout>();
+
+        // CRÉATION DU PIPELINE
+        _pipeline = _graphicsDevice.ResourceFactory.CreateGraphicsPipeline(pipelineDescription);
+
+ 
+        while (_window.Exists)
+        {
+            // Gestion des événements de la fenêtre
+            _window.PumpEvents();
+
+            // Vérification si la fenêtre est fermée
+            if (!_window.Exists)
+                break;
+
+            var commandList = _graphicsDevice.ResourceFactory.CreateCommandList();
+
+            // Commandes de rendu
+            commandList.Begin();
+            // Configuration du framebuffer et nettoyage de l'écran
+            commandList.SetFramebuffer(_graphicsDevice.SwapchainFramebuffer);
+            commandList.ClearColorTarget(0, RgbaFloat.Black);
+            commandList.SetPipeline(_pipeline);
+            commandList.SetVertexBuffer(0, _vertexBuffer);
+            commandList.SetIndexBuffer(_indexBuffer, IndexFormat.UInt16);
+            commandList.DrawIndexed(
+                indexCount: (uint)indices.Length,
+                instanceCount: 1,
+                indexStart: 0,
+                vertexOffset: 0,
+                instanceStart: 0
+            );
+
+            commandList.End();
+            _graphicsDevice.SubmitCommands(commandList);
+
+            // Logique de rendu (placeholder)
+            _graphicsDevice.SwapBuffers();
+        }
     }
 }
 
+[StructLayout(LayoutKind.Sequential)]
+public struct VertexPositionColor(Vector2 position, RgbaFloat color)
+{
+    public Vector2 Position = position;
+    public Vector4 Color = color.ToVector4();
+}
 
 
 
