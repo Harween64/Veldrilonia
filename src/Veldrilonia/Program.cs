@@ -15,6 +15,9 @@ public static class Program
     private static Shader[] _shaders;
     private static Pipeline _pipeline;
 
+    private static HashSet<Key> _pressedKeys = [];
+    private static long _previousTicks;
+
     public static void Main()
     {
         // Création de la configuration de la fenêtre
@@ -22,7 +25,7 @@ public static class Program
             x: 100,
             y: 100,
             windowWidth: 960,
-            windowHeight: 540,
+            windowHeight: 960,
             windowInitialState: WindowState.Normal,
             windowTitle: "Mon Moteur 2D Veldrid"
         );
@@ -95,7 +98,12 @@ public static class Program
 
                 void main()
                 {
-                    fsout_Color = texture(sampler2D(SurfaceTexture, SurfaceSampler), fsin_TextureCoordinate);
+                    vec4 color = texture(sampler2D(SurfaceTexture, SurfaceSampler), fsin_TextureCoordinate);
+                    float dist = distance(fsin_TextureCoordinate, vec2(0.5));
+                    float alphaMask = 1.0 - smoothstep(0.49, 0.5, dist);
+                    color.a *= alphaMask;
+    
+                    fsout_Color = color;
                 }
                 """;
         var vertexShaderDesc = new ShaderDescription(
@@ -162,19 +170,62 @@ public static class Program
         // CRÉATION DU PIPELINE
         _pipeline = _graphicsDevice.ResourceFactory.CreateGraphicsPipeline(pipelineDescription);
 
- 
+        Vector2 _position = Vector2.Zero;
+        _previousTicks = Environment.TickCount64;
+        float speed = 1.0f;
         while (_window.Exists)
         {
+            var currentTicks = Environment.TickCount64;
+            var deltaTime = (currentTicks - _previousTicks) / 1000f;
+            _previousTicks = currentTicks;
+
             // Gestion des événements de la fenêtre
-            _window.PumpEvents();
+            var input = _window.PumpEvents();
 
             // Vérification si la fenêtre est fermée
             if (!_window.Exists)
                 break;
 
+            foreach (var keyEvent in input.KeyEvents)
+            {
+                if (keyEvent.Down)
+                {
+                    _pressedKeys.Add(keyEvent.Key);
+                }
+                else
+                {
+                    _pressedKeys.Remove(keyEvent.Key);
+                }
+            }
 
+            var direction = Vector2.Zero;
+            foreach (var key in _pressedKeys)
+            {
+                direction.X += key switch
+                {
+                    Key.Left => -1,
+                    Key.Right => 1,
+                    _ => 0
+                };
+
+                direction.Y += key switch
+                {
+                    Key.Up => 1,
+                    Key.Down => -1,
+                    _ => 0
+                };
+            }
+            
+            if (direction != Vector2.Zero)
+            {
+                var distance = speed * deltaTime;
+                _position += Vector2.Normalize(direction) * distance;
+            }
+
+            var translation = Matrix4x4.CreateTranslation(_position.X, _position.Y, 0);
             var rotation = Matrix4x4.CreateRotationZ((float)Environment.TickCount / 1000f);
-            _graphicsDevice.UpdateBuffer(_uniformBuffer, 0, ref rotation);
+            var worldTransform = rotation * translation;
+            _graphicsDevice.UpdateBuffer(_uniformBuffer, 0, ref worldTransform);
 
             var commandList = _graphicsDevice.ResourceFactory.CreateCommandList();
 
