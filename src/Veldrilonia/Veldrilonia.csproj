@@ -12,6 +12,7 @@
     <ProjectReference Include="..\..\libs\veldrid\src\Veldrid.SDL2\Veldrid.SDL2.csproj" />
     <ProjectReference Include="..\..\libs\veldrid\src\Veldrid.StartupUtilities\Veldrid.StartupUtilities.csproj" />
   </ItemGroup> -->
+  
   <ItemGroup>
     <PackageReference Include="Veldrid" Version="*" />
     <PackageReference Include="Veldrid.SDL2" Version="*" />
@@ -21,6 +22,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="Assets/**" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="Rendering/**/*.glsl" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>
