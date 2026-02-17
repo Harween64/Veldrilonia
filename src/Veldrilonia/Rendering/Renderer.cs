@@ -35,7 +35,7 @@ public class Renderer
         _resourceLayout = _pipelineBuilder.CreateResourceLayout();
         
         // Créer les buffers
-        var projection = _graphicsContext.CreateOrthographicProjection();
+        var projection = _graphicsContext.OrthographicProjection;
         _renderResources.CreateBuffers(projection, instances);
         _renderResources.CreateResourceSet(_resourceLayout);
         

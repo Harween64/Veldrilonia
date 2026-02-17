@@ -25,6 +25,7 @@ public class Program
         // Variables de temps
         long previousTicks = Environment.TickCount64;
 
+        float speed = 100f;
         // Boucle principale
         while (window.Exists)
         {
@@ -54,6 +55,18 @@ public class Program
                     Key.Down => -1,
                     _ => 0
                 };
+            }
+
+            if (direction != Vector2.Zero)
+            {
+                var distanceInGraphicsCoordinates = speed * deltaTime;
+                var distanceInPixels = distanceInGraphicsCoordinates * graphicsContext.PixelsPerUnit;
+                for (int i = 0; i < instances.Length; i++)
+                {
+                    instances[i].Position += Vector2.Normalize(direction) * distanceInGraphicsCoordinates;
+                }
+                renderer.UpdateInstances(instances);
+                //_position += Vector2.Normalize(direction) * distance;
             }
 
             // Rendu

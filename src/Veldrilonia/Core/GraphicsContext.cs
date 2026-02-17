@@ -7,6 +7,7 @@ namespace UIFramework.Core;
 public class GraphicsContext
 {
     public GraphicsDevice Device { get; private set; }
+    public Matrix4x4 OrthographicProjection { get; private set; }
     private readonly Window _window;
 
     public GraphicsContext(Window window)
@@ -18,7 +19,13 @@ public class GraphicsContext
             SwapchainDepthFormat = PixelFormat.D32_Float_S8_UInt,
             SyncToVerticalBlank = true,
         });
+
+        OrthographicProjection = CreateOrthographicProjection();
+        Matrix4x4.Decompose(OrthographicProjection, out var scale, out _, out _);
+        PixelsPerUnit = scale.AsVector2(); // Assuming uniform scaling
     }
+
+    public Vector2 PixelsPerUnit { get; private set; }
 
     public void SwapBuffers()
     {
@@ -35,7 +42,7 @@ public class GraphicsContext
         Device.SubmitCommands(commandList);
     }
 
-    public Matrix4x4 CreateOrthographicProjection()
+    private Matrix4x4 CreateOrthographicProjection()
     {
         return Matrix4x4.CreateOrthographicOffCenter(
             left: 0, 
