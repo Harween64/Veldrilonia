@@ -13,20 +13,17 @@ public class RenderResources
     public DeviceBuffer UniformBuffer { get; private set; }
     public DeviceBuffer ModelBuffer { get; private set; }
     public DeviceBuffer InstanceBuffer { get; private set; }
+    public DeviceBuffer GlyphInstanceBuffer { get; private set; }
     public ResourceSet ResourceSet { get; private set; }
-    
+    public ResourceSet GlyphResourceSet { get; private set; }
     public ushort[] Indices { get; private set; }
     public Vector2[] QuadVertices { get; private set; }
 
     public RenderResources(GraphicsDevice graphicsDevice)
     {
         _graphicsDevice = graphicsDevice;
-        InitializeQuadData();
-    }
 
-    private void InitializeQuadData()
-    {
-        // Indices pour 2 triangles formant un quad
+       // Indices pour 2 triangles formant un quad
         Indices = [0, 1, 2, 0, 2, 3];
         
         // Vertices du quad (0,0) à (1,1)
@@ -39,7 +36,7 @@ public class RenderResources
         ];
     }
 
-    public void CreateBuffers(Matrix4x4 projection, UIInstanceData[] instances)
+    public void CreateBuffers(Matrix4x4 projection)
     {
         // Index Buffer
         var ibDescription = new BufferDescription(
@@ -64,9 +61,6 @@ public class RenderResources
         );
         ModelBuffer = _graphicsDevice.ResourceFactory.CreateBuffer(modelBufferDesc);
         _graphicsDevice.UpdateBuffer(ModelBuffer, 0, QuadVertices);
-
-        // Instance Buffer
-        UpdateInstanceBuffer(instances);
     }
 
     public void UpdateInstanceBuffer(UIInstanceData[] instances)
@@ -84,10 +78,36 @@ public class RenderResources
         _graphicsDevice.UpdateBuffer(InstanceBuffer, 0, instances);
     }
 
+    public void UpdateInstanceBuffer(UIGlyphData[] glyphs)
+    {
+        if (GlyphInstanceBuffer != null)
+        {
+            GlyphInstanceBuffer.Dispose();
+        }
+
+        var instanceBufferDesc = new BufferDescription(
+            (uint)(glyphs.Length * Unsafe.SizeOf<UIGlyphData>()),
+            BufferUsage.VertexBuffer
+        );
+        GlyphInstanceBuffer = _graphicsDevice.ResourceFactory.CreateBuffer(instanceBufferDesc);
+        _graphicsDevice.UpdateBuffer(GlyphInstanceBuffer, 0, glyphs);
+    }
+
     public void CreateResourceSet(ResourceLayout resourceLayout)
     {
         var resourceSetDesc = new ResourceSetDescription(resourceLayout, UniformBuffer);
         ResourceSet = _graphicsDevice.ResourceFactory.CreateResourceSet(resourceSetDesc);
+    }
+
+    public void CreateGlyphResourceSet(ResourceLayout textResourceLayout, Texture fontTexture)
+    {
+        GlyphResourceSet = _graphicsDevice.ResourceFactory.CreateResourceSet(
+            new ResourceSetDescription(textResourceLayout, 
+                UniformBuffer,
+                fontTexture,
+                _graphicsDevice.LinearSampler
+            )
+        );
     }
 
     public void Dispose()
@@ -97,5 +117,6 @@ public class RenderResources
         ModelBuffer?.Dispose();
         InstanceBuffer?.Dispose();
         ResourceSet?.Dispose();
+        GlyphResourceSet?.Dispose();
     }
 }

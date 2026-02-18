@@ -11,5 +11,5 @@ public partial class Kerning
         public long Unicode2 { get; set; }
 
         [JsonPropertyName("advance")]
-        public double Advance { get; set; }
+        public float Advance { get; set; }
     }

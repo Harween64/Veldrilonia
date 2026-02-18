@@ -13,12 +13,15 @@ public class Program
         // Initialisation
         var window = new Window(960, 960, "Mon Moteur 2D Veldrid");
         var graphicsContext = new GraphicsContext(window);
+        var fontsContext = new FontsContext(graphicsContext.Device);
         var inputManager = new InputManager();
-        var renderer = new Renderer(graphicsContext);
+        var renderer = new Renderer(graphicsContext, fontsContext);
 
+        fontsContext.LoadFont();
         // Génération de données de test
-        var instances = GenerateRandomRectangles(window.Width, window.Height, 1000);
-        
+        //var instances = GenerateRandomRectangles(window.Width, window.Height, 1000);
+        var instances = fontsContext.CreateTextInstances("Hello Veldrilonia!", new Vector2(50, 50), 50.0f);
+
         // Initialisation du renderer
         renderer.Initialize(instances);
 
@@ -39,23 +42,7 @@ public class Program
             inputManager.Update(input);
 
             // Exemple d'utilisation des inputs
-            var direction = Vector2.Zero;
-            foreach (var key in inputManager.PressedKeys)
-            {
-                direction.X += key switch
-                {
-                    Key.Left => -1,
-                    Key.Right => 1,
-                    _ => 0
-                };
-
-                direction.Y += key switch
-                {
-                    Key.Up => 1,
-                    Key.Down => -1,
-                    _ => 0
-                };
-            }
+            var direction = inputManager.GetDirection();
 
             if (direction != Vector2.Zero)
             {

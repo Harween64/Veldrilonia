@@ -5,20 +5,20 @@ namespace UIFramework.Data;
 public partial class Metrics
     {
         [JsonPropertyName("emSize")]
-        public long EmSize { get; set; }
+        public float EmSize { get; set; }
 
         [JsonPropertyName("lineHeight")]
-        public double LineHeight { get; set; }
+        public float LineHeight { get; set; }
 
         [JsonPropertyName("ascender")]
-        public double Ascender { get; set; }
+        public float Ascender { get; set; }
 
         [JsonPropertyName("descender")]
-        public double Descender { get; set; }
+        public float Descender { get; set; }
 
         [JsonPropertyName("underlineY")]
-        public double UnderlineY { get; set; }
+        public float UnderlineY { get; set; }
 
         [JsonPropertyName("underlineThickness")]
-        public double UnderlineThickness { get; set; }
+        public float UnderlineThickness { get; set; }
     }

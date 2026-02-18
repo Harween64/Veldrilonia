@@ -14,7 +14,7 @@ public class PipelineBuilder
         _graphicsDevice = graphicsDevice;
     }
 
-    public VertexLayoutDescription CreateModelLayout()
+    public VertexLayoutDescription CreateInstanceModelLayout()
     {
         return new VertexLayoutDescription(
             (uint)Unsafe.SizeOf<InstanceModelData>(),
@@ -37,6 +37,31 @@ public class PipelineBuilder
         {
             InstanceStepRate = 1
         };
+    }
+
+    public VertexLayoutDescription CreateGlyphLayout()
+    {
+        return new VertexLayoutDescription(
+            (uint)Unsafe.SizeOf<UIGlyphData>(),
+            new VertexElementDescription("GlyphPos", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float2),
+            new VertexElementDescription("GlyphSize", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float2),
+            new VertexElementDescription("GlyphUvBounds", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float4),
+            new VertexElementDescription("GlyphColor", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float4)
+        )
+        {
+            InstanceStepRate = 1 // Très important : 1 instance = 1 lettre
+        };
+    }
+
+    public ResourceLayout CreateGlyphResourceLayout()
+    {
+        var layoutDescription = new ResourceLayoutDescription(
+            new ResourceLayoutElementDescription("ProjectionBuffer", ResourceKind.UniformBuffer, ShaderStages.Vertex),
+            new ResourceLayoutElementDescription("FontTexture", ResourceKind.TextureReadOnly, ShaderStages.Fragment),
+            new ResourceLayoutElementDescription("FontSampler", ResourceKind.Sampler, ShaderStages.Fragment)
+        );
+        
+        return _graphicsDevice.ResourceFactory.CreateResourceLayout(layoutDescription);
     }
 
     public ResourceLayout CreateResourceLayout()

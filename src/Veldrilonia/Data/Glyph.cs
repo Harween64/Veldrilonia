@@ -8,7 +8,7 @@ public partial class Glyph
         public long Unicode { get; set; }
 
         [JsonPropertyName("advance")]
-        public double Advance { get; set; }
+        public float Advance { get; set; }
 
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         [JsonPropertyName("planeBounds")]

@@ -5,14 +5,20 @@ namespace UIFramework.Data;
 public partial class Bounds
     {
         [JsonPropertyName("left")]
-        public double Left { get; set; }
+        public float Left { get; set; }
 
         [JsonPropertyName("bottom")]
-        public double Bottom { get; set; }
+        public float Bottom { get; set; }
 
         [JsonPropertyName("right")]
-        public double Right { get; set; }
+        public float Right { get; set; }
 
         [JsonPropertyName("top")]
-        public double Top { get; set; }
+        public float Top { get; set; }
+
+        [JsonIgnore]
+        public float Width => Right - Left;
+
+        [JsonIgnore]
+        public float Height => Top - Bottom;
     }
