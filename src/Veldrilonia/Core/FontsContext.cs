@@ -29,7 +29,7 @@ public class FontsContext
 
         if (!_fontAtlas.TryGetValue(name, out var cachedAtlas))
         {
-            var atlasImage = new Veldrid.ImageSharp.ImageSharpTexture("Assets/font.png", mipmap: false, srgb: false);
+            var atlasImage = new Veldrid.ImageSharp.ImageSharpTexture("Assets/font.png", mipmap: true, srgb: false);
             _fontAtlas[name] = atlasImage.CreateDeviceTexture(_device, _device.ResourceFactory);
         }
     }

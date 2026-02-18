@@ -117,11 +117,11 @@ public class RenderResources
             addressModeU: SamplerAddressMode.Clamp, // Ne pas répéter horizontalement
             addressModeV: SamplerAddressMode.Clamp, // Ne pas répéter verticalement
             addressModeW: SamplerAddressMode.Clamp, // (Inutile pour la 2D, mais on le met)
-            filter: SamplerFilter.MinLinear_MagLinear_MipPoint, // Filtrage linéaire (très important !)
+            filter: SamplerFilter.MinLinear_MagLinear_MipLinear, // Filtrage linéaire (très important !)
             comparisonKind: null,
             maximumAnisotropy: 0,
             minimumLod: 0,
-            maximumLod: 0,
+            maximumLod: 8, // Permet les mipmaps si disponibles
             lodBias: 0,
             borderColor: SamplerBorderColor.TransparentBlack
         );

@@ -21,6 +21,8 @@ public class Program
         // Génération de données de test
         //var instances = GenerateRandomRectangles(window.Width, window.Height, 1000);
         var instances = fontsContext.CreateTextInstances("Hello Veldrilonia!", new Vector2(50, 50), 50.0f);
+        instances = [..instances, ..fontsContext.CreateTextInstances("This is a test of the Veldrid UI Framework.", new Vector2(50, 150), 25.0f)];
+        instances = [..instances, ..fontsContext.CreateTextInstances("MSDF text rendering with Veldrid!", new Vector2(50, 200), 10.0f)];
 
         // Initialisation du renderer
         renderer.Initialize(instances);
