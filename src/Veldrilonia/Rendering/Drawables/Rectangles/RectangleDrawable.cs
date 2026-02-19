@@ -21,8 +21,8 @@ public class RectangleDrawable(GraphicsDevice graphicsDevice, CommonResources co
         // Charger les shaders
         var shaderManager = new ShaderManager(graphicsDevice);
         var shaders = shaderManager.LoadShader(
-            "Rendering/Drawables/Rectangles/Shaders/RectangleVertex.glsl",
-            "Rendering/Drawables/Rectangles/Shaders/RectangleFragment.glsl"
+            "Rendering/Drawables/Rectangles/RectangleVertex.glsl",
+            "Rendering/Drawables/Rectangles/RectangleFragment.glsl"
         );
 
         // Layouts

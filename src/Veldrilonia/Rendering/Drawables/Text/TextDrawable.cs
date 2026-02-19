@@ -21,8 +21,8 @@ public class TextDrawable(GraphicsDevice graphicsDevice, CommonResources commonR
         // Charger les shaders
         var shaderManager = new ShaderManager(graphicsDevice);
         var shaders = shaderManager.LoadShader(
-            "Rendering/Drawables/Text/Shaders/TextVertex.glsl",
-            "Rendering/Drawables/Text/Shaders/TextFragment.glsl"
+            "Rendering/Drawables/Text/TextVertex.glsl",
+            "Rendering/Drawables/Text/TextFragment.glsl"
         );
 
         // Layouts

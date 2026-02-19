@@ -14,10 +14,9 @@ public class Program
         var window = new Window(960, 960, "Mon Moteur 2D Veldrid");
         var graphicsContext = new GraphicsContext(window);
         var fontsContext = new FontsContext(graphicsContext.Device);
+        fontsContext.LoadFont();
         var inputManager = new InputManager();
         var renderer = new Renderer(graphicsContext, fontsContext);
-
-        fontsContext.LoadFont();
         renderer.Initialize();
 
         // Génération de données de test
