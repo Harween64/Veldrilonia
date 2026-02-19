@@ -14,6 +14,7 @@ public sealed class TextDrawable(GraphicsDevice graphicsDevice, CommonResources 
     private DeviceBuffer? _instanceBuffer;
     private ShaderSet? _shaderSet;
     private GlyphData[] _data = [];
+    private uint _instanceBufferCapacity;
 
     public void Initialize()
     {
@@ -102,16 +103,25 @@ public sealed class TextDrawable(GraphicsDevice graphicsDevice, CommonResources 
     {
         _data = data;
 
-        if (_instanceBuffer != null)
+        if (data.Length == 0)
         {
-            _instanceBuffer.Dispose();
+            return;
         }
 
-        var bufferDesc = new BufferDescription(
-            (uint)(data.Length * Unsafe.SizeOf<GlyphData>()),
-            BufferUsage.VertexBuffer
-        );
-        _instanceBuffer = graphicsDevice.ResourceFactory.CreateBuffer(bufferDesc);
+        uint requiredSize = (uint)(data.Length * Unsafe.SizeOf<GlyphData>());
+
+        // Only reallocate if buffer doesn't exist or is too small
+        if (_instanceBuffer == null || _instanceBufferCapacity < requiredSize)
+        {
+            _instanceBuffer?.Dispose();
+            _instanceBufferCapacity = requiredSize;
+            var bufferDesc = new BufferDescription(
+                _instanceBufferCapacity,
+                BufferUsage.VertexBuffer | BufferUsage.Dynamic
+            );
+            _instanceBuffer = graphicsDevice.ResourceFactory.CreateBuffer(bufferDesc);
+        }
+
         graphicsDevice.UpdateBuffer(_instanceBuffer, 0, data);
     }
 
