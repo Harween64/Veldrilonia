@@ -12,9 +12,9 @@ public partial class Glyph
 
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         [JsonPropertyName("planeBounds")]
-        public Bounds PlaneBounds { get; set; }
+        public Bounds? PlaneBounds { get; set; }
 
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         [JsonPropertyName("atlasBounds")]
-        public Bounds AtlasBounds { get; set; }
+        public Bounds? AtlasBounds { get; set; }
     }

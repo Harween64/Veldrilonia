@@ -9,9 +9,9 @@ public class CommonResources
 {
     private readonly GraphicsDevice _graphicsDevice;
 
-    public DeviceBuffer IndexBuffer { get; private set; }
-    public DeviceBuffer UniformBuffer { get; private set; }
-    public DeviceBuffer ModelBuffer { get; private set; }
+    public DeviceBuffer? IndexBuffer { get; private set; }
+    public DeviceBuffer? UniformBuffer { get; private set; }
+    public DeviceBuffer? ModelBuffer { get; private set; }
 
     public ushort[] Indices { get; private set; }
     public Vector2[] QuadVertices { get; private set; }

@@ -8,10 +8,10 @@ namespace UIFramework.Rendering.Drawables.Rectangles;
 
 public class RectangleDrawable(GraphicsDevice graphicsDevice, CommonResources commonResources) : IDrawable<RectangleData>
 {
-    private Veldrid.Pipeline _pipeline;
-    private ResourceLayout _resourceLayout;
-    private ResourceSet _resourceSet;
-    private DeviceBuffer _instanceBuffer;
+    private Veldrid.Pipeline? _pipeline;
+    private ResourceLayout? _resourceLayout;
+    private ResourceSet? _resourceSet;
+    private DeviceBuffer? _instanceBuffer;
     private RectangleData[] _data = [];
 
     public void Initialize()
@@ -29,20 +29,20 @@ public class RectangleDrawable(GraphicsDevice graphicsDevice, CommonResources co
         var modelLayout = new VertexLayoutDescription(
             (uint)Unsafe.SizeOf<InstanceModelData>(),
             [
-                new VertexElementDescription("Position", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float2)
+                new VertexElementDescription("vPos", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float2)
             ]
         );
 
         var instanceLayout = new VertexLayoutDescription(
             (uint)Unsafe.SizeOf<RectangleData>(),
             [
-                new VertexElementDescription("InstancePos", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float2),
-                new VertexElementDescription("InstanceSize", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float2),
-                new VertexElementDescription("InstanceColor", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float4),
-                new VertexElementDescription("InstanceCornerRadius", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float1),
-                new VertexElementDescription("InstanceBorderThickness", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float1),
-                new VertexElementDescription("InstanceBorderColor", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float4),
-                new VertexElementDescription("InstanceDepth", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float1)
+                new VertexElementDescription("iPos", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float2),
+                new VertexElementDescription("iSize", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float2),
+                new VertexElementDescription("iColor", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float4),
+                new VertexElementDescription("iRadius", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float1),
+                new VertexElementDescription("iThickness", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float1),
+                new VertexElementDescription("iBorderColor", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float4),
+                new VertexElementDescription("iDepth", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float1)
             ]
         )
         {

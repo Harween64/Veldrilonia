@@ -23,7 +23,7 @@ public class FontsContext
         if (!_fontMetrics.ContainsKey(name))
         {
             var metricsJson = File.ReadAllText("Assets/font.json");
-            var metrics = JsonSerializer.Deserialize<FontMetrics>(metricsJson);
+            var metrics = JsonSerializer.Deserialize<FontMetrics>(metricsJson)!;
             _fontMetrics[name] = metrics;
         }
 
@@ -58,6 +58,11 @@ public class FontsContext
             if (glyph is null)
             {
                 continue; // Skip missing characters
+            }
+
+            if (metrics.Atlas is null)
+            {
+                continue; // Skip if atlas is not loaded
             }
 
             float atlasWidth = metrics.Atlas.Width;

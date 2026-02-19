@@ -8,10 +8,10 @@ namespace UIFramework.Rendering.Drawables.Text;
 
 public class TextDrawable(GraphicsDevice graphicsDevice, CommonResources commonResources, Texture fontTexture) : IDrawable<GlyphData>
 {
-    private Veldrid.Pipeline _pipeline;
-    private ResourceLayout _resourceLayout;
-    private ResourceSet _resourceSet;
-    private DeviceBuffer _instanceBuffer;
+    private Veldrid.Pipeline? _pipeline;
+    private ResourceLayout? _resourceLayout;
+    private ResourceSet? _resourceSet;
+    private DeviceBuffer? _instanceBuffer;
     private GlyphData[] _data = [];
 
     public void Initialize()
