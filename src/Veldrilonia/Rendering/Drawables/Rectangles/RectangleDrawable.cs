@@ -28,25 +28,31 @@ public class RectangleDrawable(GraphicsDevice graphicsDevice, CommonResources co
         // Layouts
         var modelLayout = new VertexLayoutDescription(
             (uint)Unsafe.SizeOf<InstanceModelData>(),
-            new VertexElementDescription("Position", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float2)
+            [
+                new VertexElementDescription("Position", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float2)
+            ]
         );
 
         var instanceLayout = new VertexLayoutDescription(
             (uint)Unsafe.SizeOf<RectangleData>(),
-            new VertexElementDescription("InstancePos", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float2),
-            new VertexElementDescription("InstanceSize", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float2),
-            new VertexElementDescription("InstanceColor", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float4),
-            new VertexElementDescription("InstanceCornerRadius", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float1),
-            new VertexElementDescription("InstanceBorderThickness", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float1),
-            new VertexElementDescription("InstanceBorderColor", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float4),
-            new VertexElementDescription("InstanceDepth", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float1)
+            [
+                new VertexElementDescription("InstancePos", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float2),
+                new VertexElementDescription("InstanceSize", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float2),
+                new VertexElementDescription("InstanceColor", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float4),
+                new VertexElementDescription("InstanceCornerRadius", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float1),
+                new VertexElementDescription("InstanceBorderThickness", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float1),
+                new VertexElementDescription("InstanceBorderColor", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float4),
+                new VertexElementDescription("InstanceDepth", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float1)
+            ]
         )
         {
             InstanceStepRate = 1
         };
 
         var layoutDescription = new ResourceLayoutDescription(
-            new ResourceLayoutElementDescription("ProjectionBuffer", ResourceKind.UniformBuffer, ShaderStages.Vertex)
+            [
+                new ResourceLayoutElementDescription("ProjectionBuffer", ResourceKind.UniformBuffer, ShaderStages.Vertex)
+            ]
         );
         _resourceLayout = factory.CreateResourceLayout(layoutDescription);
 
@@ -56,7 +62,7 @@ public class RectangleDrawable(GraphicsDevice graphicsDevice, CommonResources co
             BlendState = BlendStateDescription.SingleAlphaBlend,
             DepthStencilState = new DepthStencilStateDescription(
                 depthTestEnabled: true,
-                depthWriteEnabled: false,
+                depthWriteEnabled: true,
                 comparisonKind: ComparisonKind.LessEqual
             ),
             RasterizerState = RasterizerStateDescription.CullNone,
@@ -72,7 +78,7 @@ public class RectangleDrawable(GraphicsDevice graphicsDevice, CommonResources co
         _pipeline = factory.CreateGraphicsPipeline(pipelineDescription);
 
         // Resource Set
-        var resourceSetDesc = new ResourceSetDescription(_resourceLayout, commonResources.UniformBuffer);
+        var resourceSetDesc = new ResourceSetDescription(_resourceLayout, [commonResources.UniformBuffer]);
         _resourceSet = factory.CreateResourceSet(resourceSetDesc);
     }
 

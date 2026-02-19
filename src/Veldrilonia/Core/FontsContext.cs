@@ -20,14 +20,14 @@ public class FontsContext
 
     public void LoadFont(string name = "default")
     {
-        if (!_fontMetrics.TryGetValue(name, out var cachedMetrics))
+        if (!_fontMetrics.ContainsKey(name))
         {
             var metricsJson = File.ReadAllText("Assets/font.json");
             var metrics = JsonSerializer.Deserialize<FontMetrics>(metricsJson);
             _fontMetrics[name] = metrics;
         }
 
-        if (!_fontAtlas.TryGetValue(name, out var cachedAtlas))
+        if (!_fontAtlas.ContainsKey(name))
         {
             var atlasImage = new Veldrid.ImageSharp.ImageSharpTexture("Assets/font.png", mipmap: true, srgb: false);
             _fontAtlas[name] = atlasImage.CreateDeviceTexture(_device, _device.ResourceFactory);

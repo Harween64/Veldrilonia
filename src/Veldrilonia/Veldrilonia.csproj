@@ -14,11 +14,11 @@
   </ItemGroup> -->
 
   <ItemGroup>
-    <PackageReference Include="Veldrid" Version="*" />
-    <PackageReference Include="Veldrid.SDL2" Version="*" />
-    <PackageReference Include="Veldrid.SPIRV" Version="*" />
-    <PackageReference Include="Veldrid.ImageSharp" Version="*" />
-    <PackageReference Include="Veldrid.StartupUtilities" Version="*" />
+    <PackageReference Include="Veldrid" />
+    <PackageReference Include="Veldrid.SDL2" />
+    <PackageReference Include="Veldrid.SPIRV" />
+    <PackageReference Include="Veldrid.ImageSharp" />
+    <PackageReference Include="Veldrid.StartupUtilities" />
   </ItemGroup>
 
   <ItemGroup>
