@@ -6,12 +6,13 @@ using Veldrid;
 
 namespace UIFramework.Rendering.Drawables.Rectangles;
 
-public class RectangleDrawable(GraphicsDevice graphicsDevice, CommonResources commonResources) : IDrawable<RectangleData>
+public sealed class RectangleDrawable(GraphicsDevice graphicsDevice, CommonResources commonResources) : IDrawable<RectangleData>
 {
     private Veldrid.Pipeline? _pipeline;
     private ResourceLayout? _resourceLayout;
     private ResourceSet? _resourceSet;
     private DeviceBuffer? _instanceBuffer;
+    private ShaderSet? _shaderSet;
     private RectangleData[] _data = [];
 
     public void Initialize()
@@ -20,7 +21,7 @@ public class RectangleDrawable(GraphicsDevice graphicsDevice, CommonResources co
 
         // Charger les shaders
         var shaderManager = new ShaderManager(graphicsDevice);
-        var shaders = shaderManager.LoadShader(
+        _shaderSet = shaderManager.LoadShader(
             "Rendering/Drawables/Rectangles/RectangleVertex.glsl",
             "Rendering/Drawables/Rectangles/RectangleFragment.glsl"
         );
@@ -69,7 +70,7 @@ public class RectangleDrawable(GraphicsDevice graphicsDevice, CommonResources co
             PrimitiveTopology = PrimitiveTopology.TriangleList,
             ShaderSet = new ShaderSetDescription(
                 [modelLayout, instanceLayout],
-                shaders
+                [.. _shaderSet]
             ),
             Outputs = graphicsDevice.SwapchainFramebuffer.OutputDescription,
             ResourceLayouts = [_resourceLayout]
@@ -129,5 +130,6 @@ public class RectangleDrawable(GraphicsDevice graphicsDevice, CommonResources co
         _resourceLayout?.Dispose();
         _resourceSet?.Dispose();
         _instanceBuffer?.Dispose();
+        _shaderSet?.Dispose();
     }
 }

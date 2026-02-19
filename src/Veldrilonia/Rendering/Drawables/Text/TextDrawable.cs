@@ -6,12 +6,13 @@ using Veldrid;
 
 namespace UIFramework.Rendering.Drawables.Text;
 
-public class TextDrawable(GraphicsDevice graphicsDevice, CommonResources commonResources, Texture fontTexture) : IDrawable<GlyphData>
+public sealed class TextDrawable(GraphicsDevice graphicsDevice, CommonResources commonResources, Texture fontTexture) : IDrawable<GlyphData>
 {
     private Veldrid.Pipeline? _pipeline;
     private ResourceLayout? _resourceLayout;
     private ResourceSet? _resourceSet;
     private DeviceBuffer? _instanceBuffer;
+    private ShaderSet? _shaderSet;
     private GlyphData[] _data = [];
 
     public void Initialize()
@@ -20,7 +21,7 @@ public class TextDrawable(GraphicsDevice graphicsDevice, CommonResources commonR
 
         // Charger les shaders
         var shaderManager = new ShaderManager(graphicsDevice);
-        var shaders = shaderManager.LoadShader(
+        _shaderSet = shaderManager.LoadShader(
             "Rendering/Drawables/Text/TextVertex.glsl",
             "Rendering/Drawables/Text/TextFragment.glsl"
         );
@@ -62,7 +63,7 @@ public class TextDrawable(GraphicsDevice graphicsDevice, CommonResources commonR
             PrimitiveTopology = PrimitiveTopology.TriangleList,
             ShaderSet = new ShaderSetDescription(
                 [modelLayout, instanceLayout],
-                shaders
+                [.. _shaderSet]
             ),
             Outputs = graphicsDevice.SwapchainFramebuffer.OutputDescription,
             ResourceLayouts = [_resourceLayout]
@@ -143,5 +144,6 @@ public class TextDrawable(GraphicsDevice graphicsDevice, CommonResources commonR
         _resourceLayout?.Dispose();
         _resourceSet?.Dispose();
         _instanceBuffer?.Dispose();
+        _shaderSet?.Dispose();
     }
 }
