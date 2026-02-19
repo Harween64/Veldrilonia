@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -7,4 +7,28 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <!-- <ItemGroup>
+    <ProjectReference Include="..\..\libs\veldrid\src\Veldrid\Veldrid.csproj" />
+    <ProjectReference Include="..\..\libs\veldrid\src\Veldrid.SDL2\Veldrid.SDL2.csproj" />
+    <ProjectReference Include="..\..\libs\veldrid\src\Veldrid.StartupUtilities\Veldrid.StartupUtilities.csproj" />
+  </ItemGroup> -->
+
+  <ItemGroup>
+    <PackageReference Include="Veldrid" />
+    <PackageReference Include="Veldrid.SDL2" />
+    <PackageReference Include="Veldrid.SPIRV" />
+    <PackageReference Include="Veldrid.ImageSharp" />
+    <PackageReference Include="Veldrid.StartupUtilities" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Assets/font.*" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="Rendering/**/*.glsl" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <!--
+  <Target Name="GenerateFontAtlas" BeforeTargets="Build">
+    <Exec Command="..\..\tools\msdf-atlas-gen.exe -font Assets\segoeui.ttf -type msdf -dimensions 512 512 -pxrange 8 -pxalign on -imageout Assets/font.png -json Assets\font.json" />
+  </Target>
+  -->
 </Project>
