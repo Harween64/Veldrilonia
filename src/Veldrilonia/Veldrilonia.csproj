@@ -27,6 +27,6 @@
   </ItemGroup>
 
   <Target Name="GenerateFontAtlas" BeforeTargets="Build">
-    <Exec Command="..\..\tools\msdf-atlas-gen.exe -font Assets\segoeui.ttf -type msdf -size 512 512 -pxrange 4 -imageout Assets\font.png -json Assets\font.json" />
+    <Exec Command="..\..\tools\msdf-atlas-gen.exe -font Assets\segoeui.ttf -type msdf -dimensions 512 512 -pxrange 8 -pxalign on -imageout Assets\font.png -json Assets\font.json" />
   </Target>
 </Project>
