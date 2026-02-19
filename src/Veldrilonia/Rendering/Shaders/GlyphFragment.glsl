@@ -21,7 +21,7 @@ void main() {
     //float pixelVariation = fwidth(median); // Calcul de la variation du pixel pour l'anti-aliasing
     //float alpha = smoothstep(0.5 - pixelVariation, 0.5 + pixelVariation, median); // Lissage autour du seuil de 0.5
 
-    float pxRange = 4.0; // La plage de pixels que le MSDF représente (doit correspondre à ce qui a été utilisé pour générer la texture)
+    float pxRange = 8.0; // La plage de pixels que le MSDF représente (doit correspondre à ce qui a été utilisé pour générer la texture)
     vec2 msdfUnit = pxRange / vec2(textureSize(sampler2D(FontTexture, FontSampler), 0));
     vec2 screenTexSize = vec2(1.0) / fwidth(f_uv);
     float screenPxRange = max(0.5 * dot(msdfUnit, screenTexSize), 1.0);

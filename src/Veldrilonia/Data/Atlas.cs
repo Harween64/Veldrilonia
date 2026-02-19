@@ -14,7 +14,7 @@ public partial class Atlas
         public long DistanceRangeMiddle { get; set; }
 
         [JsonPropertyName("size")]
-        public long Size { get; set; }
+        public float Size { get; set; }
 
         [JsonPropertyName("width")]
         public long Width { get; set; }
