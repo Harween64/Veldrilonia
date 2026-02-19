@@ -5,7 +5,7 @@ namespace UIFramework.Data;
 public partial class Atlas
     {
         [JsonPropertyName("type")]
-        public string Type { get; set; }
+        public string? Type { get; set; }
 
         [JsonPropertyName("distanceRange")]
         public long DistanceRange { get; set; }
@@ -23,5 +23,5 @@ public partial class Atlas
         public long Height { get; set; }
 
         [JsonPropertyName("yOrigin")]
-        public string YOrigin { get; set; }
+        public string? YOrigin { get; set; }
     }
