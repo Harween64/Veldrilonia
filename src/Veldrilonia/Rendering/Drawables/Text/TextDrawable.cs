@@ -6,22 +6,22 @@ using Veldrid;
 
 namespace UIFramework.Rendering.Drawables.Text;
 
-public sealed class TextDrawable(GraphicsDevice graphicsDevice, CommonResources commonResources, Texture fontTexture) : IDrawable<GlyphData>
+public sealed class TextDrawable : Drawable<GlyphData>
 {
-    private Veldrid.Pipeline? _pipeline;
-    private ResourceLayout? _resourceLayout;
-    private ResourceSet? _resourceSet;
-    private DeviceBuffer? _instanceBuffer;
-    private ShaderSet? _shaderSet;
-    private GlyphData[] _data = [];
-    private uint _instanceBufferCapacity;
+    private readonly Texture _fontTexture;
 
-    public void Initialize()
+    public TextDrawable(GraphicsDevice graphicsDevice, CommonResources commonResources, Texture fontTexture)
+        : base(graphicsDevice, commonResources)
     {
-        var factory = graphicsDevice.ResourceFactory;
+        _fontTexture = fontTexture ?? throw new ArgumentNullException(nameof(fontTexture));
+    }
+
+    public override void Initialize()
+    {
+        var factory = GraphicsDevice.ResourceFactory;
 
         // Charger les shaders
-        var shaderManager = new ShaderManager(graphicsDevice);
+        var shaderManager = new ShaderManager(GraphicsDevice);
         _shaderSet = shaderManager.LoadShader(
             "Rendering/Drawables/Text/TextVertex.glsl",
             "Rendering/Drawables/Text/TextFragment.glsl"
@@ -66,7 +66,7 @@ public sealed class TextDrawable(GraphicsDevice graphicsDevice, CommonResources 
                 [modelLayout, instanceLayout],
                 [.. _shaderSet]
             ),
-            Outputs = graphicsDevice.SwapchainFramebuffer.OutputDescription,
+            Outputs = GraphicsDevice.SwapchainFramebuffer.OutputDescription,
             ResourceLayouts = [_resourceLayout]
         };
 
@@ -75,8 +75,8 @@ public sealed class TextDrawable(GraphicsDevice graphicsDevice, CommonResources 
         // Resource Set
         var resourceSetDesc = new ResourceSetDescription(
             _resourceLayout,
-            commonResources.UniformBuffer,
-            fontTexture,
+            CommonResources.UniformBuffer,
+            _fontTexture,
             CreateMdsfSampler(factory)
         );
         _resourceSet = factory.CreateResourceSet(resourceSetDesc);
@@ -99,61 +99,26 @@ public sealed class TextDrawable(GraphicsDevice graphicsDevice, CommonResources 
         return factory.CreateSampler(samplerDesc);
     }
 
-    public void UpdateInstances(GlyphData[] data)
-    {
-        _data = data;
-
-        if (data.Length == 0)
-        {
-            return;
-        }
-
-        uint requiredSize = (uint)(data.Length * Unsafe.SizeOf<GlyphData>());
-
-        // Only reallocate if buffer doesn't exist or is too small
-        if (_instanceBuffer == null || _instanceBufferCapacity < requiredSize)
-        {
-            _instanceBuffer?.Dispose();
-            _instanceBufferCapacity = requiredSize;
-            var bufferDesc = new BufferDescription(
-                _instanceBufferCapacity,
-                BufferUsage.VertexBuffer | BufferUsage.Dynamic
-            );
-            _instanceBuffer = graphicsDevice.ResourceFactory.CreateBuffer(bufferDesc);
-        }
-
-        graphicsDevice.UpdateBuffer(_instanceBuffer, 0, data);
-    }
-
-    public void Update(float deltaTime)
+    public override void Update(float deltaTime)
     {
     }
 
-    public void Draw(CommandList commandList)
+    public override void Draw(CommandList commandList)
     {
         if (_data.Length == 0) return;
 
         commandList.SetPipeline(_pipeline);
         commandList.SetGraphicsResourceSet(0, _resourceSet);
-        commandList.SetVertexBuffer(0, commonResources.ModelBuffer);
+        commandList.SetVertexBuffer(0, CommonResources.ModelBuffer);
         commandList.SetVertexBuffer(1, _instanceBuffer);
-        commandList.SetIndexBuffer(commonResources.IndexBuffer, IndexFormat.UInt16);
+        commandList.SetIndexBuffer(CommonResources.IndexBuffer, IndexFormat.UInt16);
 
         commandList.DrawIndexed(
-            indexCount: (uint)commonResources.Indices.Length,
+            indexCount: (uint)CommonResources.Indices.Length,
             instanceCount: (uint)_data.Length,
             indexStart: 0,
             vertexOffset: 0,
             instanceStart: 0
         );
-    }
-
-    public void Dispose()
-    {
-        _pipeline?.Dispose();
-        _resourceLayout?.Dispose();
-        _resourceSet?.Dispose();
-        _instanceBuffer?.Dispose();
-        _shaderSet?.Dispose();
     }
 }
