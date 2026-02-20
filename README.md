@@ -1,17 +1,31 @@
 # Veldrilonia
 
-Projet de test utilisant Veldrid et Avalonia en local.
+Le but principal de ce projet est d'apprendre à se servir de **Veldrid** et de découvrir la programmation GPU.
+
+Il a évolué pour intégrer des fonctionnalités de dessin (*Drawable features*), telles que :
+- L'affichage de rectangles
+- L'affichage de texte
+
+*(Initialement, ce projet était configuré pour un test local utilisant Veldrid et Avalonia).*
 
 ## Structure du projet
 
-```
+```text
 veldrilonia/
 ├── Veldrilonia.sln           # Solution .NET principale
 ├── src/
 │   └── Veldrilonia/          # Projet console .NET
+│       ├── Assets/           # Ressources externes (Polices de texte, Images, etc.)
+│       ├── Core/             # Composants centraux (Window, GraphicsContext, InputManager)
+│       ├── Data/             # Structures et modèles de données (Atlas, Glyph, RectangleData, etc.)
+│       ├── Rendering/        # Moteur graphique et logique de rendu Veldrid
+│       │   ├── Drawables/    # Éléments affichables (Textes, Rectangles)
+│       │   ├── Pipeline/     # Configuration et états des pipelines graphiques
+│       │   ├── Shaders/      # Code des shaders
+│       │   └── Renderer.cs   # Moteur de rendu principal
 │       ├── Veldrilonia.csproj
-│       └── Program.cs
-└── libs/                      # Bibliothèques externes (submodules)
+│       └── Program.cs        # Point d'entrée de l'application
+└── libs/                     # Bibliothèques externes (submodules)
     ├── veldrid/              # Fork de veldrid/veldrid
     └── Avalonia/             # Fork de Harween64/Avalonia
 ```
