@@ -14,24 +14,26 @@ public class Program
         var window = new Window(960, 960, "Mon Moteur 2D Veldrid");
         var graphicsContext = new GraphicsContext(window);
         var fontsContext = new FontsContext(graphicsContext.Device);
-        fontsContext.LoadFont("segoeui");
-        fontsContext.LoadFont("FiraCode-Regular");
+        fontsContext.LoadFont("Segoe UI");
+        fontsContext.LoadFont("Fira Code");
         var inputManager = new InputManager();
         var renderer = new Renderer(graphicsContext, fontsContext);
         renderer.Initialize();
 
         // Génération de données de test
         //var instances = GenerateRandomRectangles(window.Width, window.Height, 1000);
-        var instances1 = fontsContext.CreateTextInstances("segoeui", "Hello Veldrilonia!", new Vector2(50, 50), 50.0f);
-        var instances2 = fontsContext.CreateTextInstances("FiraCode-Regular", "This is a test of the Veldrid UI Framework.", new Vector2(50, 150), 25.0f);
-        var instances3 = fontsContext.CreateTextInstances("segoeui", "MSDF text rendering with Veldrid!", new Vector2(50, 200), 10.0f);
+        var instances1 = fontsContext.CreateTextInstances("Segoe UI", FontVariantName.Regular, "Hello Veldrilonia!", new Vector2(50, 50), 50.0f);
+        var instances2 = fontsContext.CreateTextInstances("Fira Code", FontVariantName.Regular, "This is a test of the Veldrid UI Framework.", new Vector2(50, 150), 25.0f);
+        var instances3 = fontsContext.CreateTextInstances("Segoe UI", FontVariantName.Bold, "MSDF text rendering with Veldrid!", new Vector2(50, 200), 10.0f);
+        var instances4 = fontsContext.CreateTextInstances("Fira Code", FontVariantName.Bold, "Fira Code Bold Text!", new Vector2(50, 250), 25.0f);
+        var instances5 = fontsContext.CreateTextInstances("Segoe UI", FontVariantName.Italic, "SegoeUI Italic Text!", new Vector2(50, 300), 25.0f);
 
-        var segoeInstances = instances1.Concat(instances3).ToArray();
-        var firaInstances = instances2;
+        var segoeInstances = instances1.Concat(instances3).Concat(instances5).ToArray();
+        var firaInstances = instances2.Concat(instances4).ToArray();
 
         // Mise à jour des données du renderer
-        renderer.Texts["segoeui"].UpdateInstances(segoeInstances);
-        renderer.Texts["FiraCode-Regular"].UpdateInstances(firaInstances);
+        renderer.Texts["Segoe UI"].UpdateInstances(segoeInstances);
+        renderer.Texts["Fira Code"].UpdateInstances(firaInstances);
 
         // Variables de temps
         long previousTicks = Environment.TickCount64;
@@ -64,8 +66,8 @@ public class Program
                 {
                     firaInstances[i].Position += Vector2.Normalize(direction) * distanceInGraphicsCoordinates;
                 }
-                renderer.Texts["segoeui"].UpdateInstances(segoeInstances);
-                renderer.Texts["FiraCode-Regular"].UpdateInstances(firaInstances);
+                renderer.Texts["Segoe UI"].UpdateInstances(segoeInstances);
+                renderer.Texts["Fira Code"].UpdateInstances(firaInstances);
                 //_position += Vector2.Normalize(direction) * distance;
             }
 

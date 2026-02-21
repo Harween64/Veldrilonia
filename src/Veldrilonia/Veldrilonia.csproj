@@ -27,11 +27,7 @@
   </ItemGroup>
 
   
-  <ItemGroup>
-    <FontSourceFiles Include="Assets\Fonts\*.ttf" />
-  </ItemGroup>
-
-  <Target Name="GenerateFontAtlas" BeforeTargets="Build" Inputs="@(FontSourceFiles)" Outputs="@(FontSourceFiles->'Assets\Fonts\%(Filename).png');@(FontSourceFiles->'Assets\Fonts\%(Filename).json')">
-    <Exec Command="..\..\tools\msdf-atlas-gen.exe -font &quot;%(FontSourceFiles.Identity)&quot; -type msdf -dimensions 512 512 -pxrange 8 -pxalign on -imageout &quot;Assets\Fonts\%(Filename).png&quot; -json &quot;Assets\Fonts\%(Filename).json&quot;" />
+  <Target Name="GenerateFontAtlas" BeforeTargets="Build">
+    <Exec Command="powershell -ExecutionPolicy Bypass -File ..\..\tools\GenerateFontAtlases.ps1" />
   </Target>
 </Project>

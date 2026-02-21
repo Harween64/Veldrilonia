@@ -2,12 +2,12 @@ using System.Text.Json.Serialization;
 
 namespace UIFramework.Data;
 
-public partial class FontMetrics
+public class FontVariant
 {
     private Dictionary<char, Glyph> glyphs = new();
 
-    [JsonPropertyName("atlas")]
-    public Atlas? Atlas { get; set; }
+    [JsonPropertyName("name")]
+    public string Name { get; set; } = string.Empty;
 
     [JsonPropertyName("metrics")]
     public Metrics? Metrics { get; set; }
@@ -18,20 +18,8 @@ public partial class FontMetrics
     [JsonPropertyName("kerning")]
     public List<Kerning>? Kerning { get; set; }
 
-    [JsonPropertyName("variants")]
-    public List<FontVariant>? Variants { get; set; }
-
-    public Glyph? GetGlyph(char unicode, string variantName = FontVariantName.Regular)
+    public Glyph? GetGlyph(char unicode)
     {
-        if (Variants != null)
-        {
-            var variant = Variants.FirstOrDefault(v => string.Equals(v.Name, variantName, StringComparison.OrdinalIgnoreCase));
-            if (variant != null)
-            {
-                return variant.GetGlyph(unicode);
-            }
-        }
-
         if (glyphs.TryGetValue(unicode, out var glyph))
         {
             return glyph;

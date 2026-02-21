@@ -46,7 +46,7 @@ public class FontsContext
         throw new Exception($"Font atlas not loaded for '{name}'");
     }
 
-    public GlyphData[] CreateTextInstances(string fontName, string text, Vector2 startPosition, float fontSize)
+    public GlyphData[] CreateTextInstances(string fontName, string variantName, string text, Vector2 startPosition, float fontSize)
     {
         if (!_fontMetrics.TryGetValue(fontName, out var metrics))
             throw new Exception($"Font metrics not loaded for '{fontName}'");
@@ -56,7 +56,7 @@ public class FontsContext
 
         foreach (var character in text)
         {
-            var glyph = metrics.GetGlyph(character);
+            var glyph = metrics.GetGlyph(character, variantName);
             if (glyph is null)
             {
                 continue; // Skip missing characters
