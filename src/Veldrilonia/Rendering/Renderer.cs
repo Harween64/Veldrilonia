@@ -16,7 +16,7 @@ public class Renderer
 
     // Drawables
     public RectangleDrawable Rectangles { get; private set; }
-    public TextDrawable Text { get; private set; }
+    public Dictionary<string, TextDrawable> Texts { get; private set; } = [];
 
     private readonly List<IDrawable> _drawables = [];
 
@@ -27,10 +27,14 @@ public class Renderer
         _commonResources = new CommonResources(graphicsContext.Device);
 
         Rectangles = new RectangleDrawable(graphicsContext.Device, _commonResources);
-        Text = new TextDrawable(graphicsContext.Device, _commonResources, fontsContext.GetFontTexture());
-
         _drawables.Add(Rectangles);
-        _drawables.Add(Text);
+
+        foreach (var fontName in _fontsContext.LoadedFonts)
+        {
+            var textDrawable = new TextDrawable(graphicsContext.Device, _commonResources, _fontsContext.GetFontTexture(fontName));
+            Texts[fontName] = textDrawable;
+            _drawables.Add(textDrawable);
+        }
     }
 
     public void Initialize()

@@ -13,28 +13,30 @@ public class FontsContext
 
     private readonly Dictionary<string, Texture> _fontAtlas = [];
 
+    public IEnumerable<string> LoadedFonts => _fontAtlas.Keys;
+
     public FontsContext(GraphicsDevice device)
     {
         _device = device;
     }
 
-    public void LoadFont(string name = "default")
+    public void LoadFont(string name)
     {
         if (!_fontMetrics.ContainsKey(name))
         {
-            var metricsJson = File.ReadAllText("Assets/font.json");
+            var metricsJson = File.ReadAllText($"Assets/Fonts/{name}.json");
             var metrics = JsonSerializer.Deserialize<FontMetrics>(metricsJson)!;
             _fontMetrics[name] = metrics;
         }
 
         if (!_fontAtlas.ContainsKey(name))
         {
-            var atlasImage = new Veldrid.ImageSharp.ImageSharpTexture("Assets/font.png", mipmap: true, srgb: false);
+            var atlasImage = new Veldrid.ImageSharp.ImageSharpTexture($"Assets/Fonts/{name}.png", mipmap: true, srgb: false);
             _fontAtlas[name] = atlasImage.CreateDeviceTexture(_device, _device.ResourceFactory);
         }
     }
 
-    public Texture GetFontTexture(string name = "default")
+    public Texture GetFontTexture(string name)
     {
         if (_fontAtlas.TryGetValue(name, out var atlas))
         {
@@ -44,10 +46,10 @@ public class FontsContext
         throw new Exception($"Font atlas not loaded for '{name}'");
     }
 
-    public GlyphData[] CreateTextInstances(string text, Vector2 startPosition, float fontSize)
+    public GlyphData[] CreateTextInstances(string fontName, string text, Vector2 startPosition, float fontSize)
     {
-        if (!_fontMetrics.TryGetValue("default", out var metrics))
-            throw new Exception("Font metrics not loaded for 'default'");
+        if (!_fontMetrics.TryGetValue(fontName, out var metrics))
+            throw new Exception($"Font metrics not loaded for '{fontName}'");
 
         var instances = new List<GlyphData>();
         var cursor = startPosition;
