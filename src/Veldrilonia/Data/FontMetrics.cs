@@ -18,8 +18,20 @@ public partial class FontMetrics
     [JsonPropertyName("kerning")]
     public List<Kerning>? Kerning { get; set; }
 
-    public Glyph? GetGlyph(char unicode)
+    [JsonPropertyName("variants")]
+    public List<FontVariant>? Variants { get; set; }
+
+    public Glyph? GetGlyph(char unicode, string variantName = FontVariantName.Regular)
     {
+        if (Variants != null)
+        {
+            var variant = Variants.FirstOrDefault(v => string.Equals(v.Name, variantName, StringComparison.OrdinalIgnoreCase));
+            if (variant != null)
+            {
+                return variant.GetGlyph(unicode);
+            }
+        }
+
         if (glyphs.TryGetValue(unicode, out var glyph))
         {
             return glyph;
