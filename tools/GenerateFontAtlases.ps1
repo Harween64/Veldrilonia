@@ -68,7 +68,6 @@ foreach ($family in $families.Keys) {
     
     $msdfGen = Join-Path $toolsDir "msdf-atlas-gen.exe"
     
-    #$fullArgs = $argsList + @("-type", "msdf", "-dimensions", "512", "512", "-pxrange", "8", "-pxalign", "on", "-imageout", $outPng, "-json", $outJson)
     $fullArgs = $argsList + @("-type", "msdf", "-potr", "-pxrange", "8", "-pxalign", "on", "-imageout", $outPng, "-json", $outJson)
     
     Write-Host "Generating atlas for family: $family"

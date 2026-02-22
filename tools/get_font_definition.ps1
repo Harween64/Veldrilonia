@@ -1,7 +1,12 @@
+param(
+    [Parameter(Mandatory = $true)]
+    [string]$FontPath
+)
+
 Add-Type -AssemblyName PresentationCore
-$ttfPath = [System.IO.Path]::GetFullPath('./src/Veldrilonia/Assets/Fonts/FiraCode-Bold.ttf')
+$ttfPath = [System.IO.Path]::GetFullPath($FontPath)
 if (!(Test-Path $ttfPath)) {
-    Write-Error "path not exits: $ttfPath"
+    Write-Error "path not exists: $ttfPath"
     exit 1
 }
 $glyphTypeface = New-Object -TypeName Windows.Media.GlyphTypeface -ArgumentList $ttfPath
