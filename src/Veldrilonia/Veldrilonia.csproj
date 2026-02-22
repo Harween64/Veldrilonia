@@ -22,13 +22,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="Assets/font.*" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="Rendering/**/*.glsl" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="Assets\Fonts\**" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="Rendering\**\*.glsl" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
-  <!--
+  
   <Target Name="GenerateFontAtlas" BeforeTargets="Build">
-    <Exec Command="..\..\tools\msdf-atlas-gen.exe -font Assets\segoeui.ttf -type msdf -dimensions 512 512 -pxrange 8 -pxalign on -imageout Assets/font.png -json Assets\font.json" />
+    <Exec Command="powershell -ExecutionPolicy Bypass -File ..\..\tools\GenerateFontAtlases.ps1" />
   </Target>
-  -->
 </Project>
