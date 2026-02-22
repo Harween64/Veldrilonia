@@ -2,7 +2,7 @@ using System.Numerics;
 using Veldrid;
 using Veldrid.StartupUtilities;
 
-namespace UIFramework.Core;
+namespace Veldridonia.Core;
 
 public class GraphicsContext
 {

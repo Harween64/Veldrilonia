@@ -1,17 +1,13 @@
 using System.Runtime.CompilerServices;
-using UIFramework.Data;
-using UIFramework.Rendering.Pipeline;
-using UIFramework.Rendering.Shaders;
+using Veldridonia.Rendering.Pipeline;
 using Veldrid;
 
-namespace UIFramework.Rendering.Drawables.Rectangles;
+namespace Veldridonia.Rendering.Features;
 
-public sealed class RectangleDrawable : Drawable<RectangleData>
+public sealed class TextRenderFeature(GraphicsDevice graphicsDevice, CommonResources commonResources, Texture fontTexture)
+    : RenderFeatureBase<GlyphData>(graphicsDevice, commonResources)
 {
-    public RectangleDrawable(GraphicsDevice graphicsDevice, CommonResources commonResources)
-        : base(graphicsDevice, commonResources)
-    {
-    }
+    private readonly Texture _fontTexture = fontTexture ?? throw new ArgumentNullException(nameof(fontTexture));
 
     public override void Initialize()
     {
@@ -20,38 +16,31 @@ public sealed class RectangleDrawable : Drawable<RectangleData>
         // Charger les shaders
         var shaderManager = new ShaderManager(GraphicsDevice);
         _shaderSet = shaderManager.LoadShader(
-            "Rendering/Drawables/Rectangles/RectangleVertex.glsl",
-            "Rendering/Drawables/Rectangles/RectangleFragment.glsl"
+            "Rendering/Features/Text/TextVertex.glsl",
+            "Rendering/Features/Text/TextFragment.glsl"
         );
 
         // Layouts
         var modelLayout = new VertexLayoutDescription(
             (uint)Unsafe.SizeOf<InstanceModelData>(),
-            [
-                new VertexElementDescription("vPos", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float2)
-            ]
+            new VertexElementDescription("Position", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float2)
         );
 
         var instanceLayout = new VertexLayoutDescription(
-            (uint)Unsafe.SizeOf<RectangleData>(),
-            [
-                new VertexElementDescription("iPos", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float2),
-                new VertexElementDescription("iSize", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float2),
-                new VertexElementDescription("iColor", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float4),
-                new VertexElementDescription("iRadius", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float1),
-                new VertexElementDescription("iThickness", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float1),
-                new VertexElementDescription("iBorderColor", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float4),
-                new VertexElementDescription("iDepth", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float1)
-            ]
+            (uint)Unsafe.SizeOf<GlyphData>(),
+            new VertexElementDescription("GlyphPos", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float2),
+            new VertexElementDescription("GlyphSize", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float2),
+            new VertexElementDescription("GlyphUvBounds", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float4),
+            new VertexElementDescription("GlyphColor", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float4)
         )
         {
             InstanceStepRate = 1
         };
 
         var layoutDescription = new ResourceLayoutDescription(
-            [
-                new ResourceLayoutElementDescription("ProjectionBuffer", ResourceKind.UniformBuffer, ShaderStages.Vertex)
-            ]
+            new ResourceLayoutElementDescription("ProjectionBuffer", ResourceKind.UniformBuffer, ShaderStages.Vertex),
+            new ResourceLayoutElementDescription("FontTexture", ResourceKind.TextureReadOnly, ShaderStages.Fragment),
+            new ResourceLayoutElementDescription("FontSampler", ResourceKind.Sampler, ShaderStages.Fragment)
         );
         _resourceLayout = factory.CreateResourceLayout(layoutDescription);
 
@@ -61,7 +50,7 @@ public sealed class RectangleDrawable : Drawable<RectangleData>
             BlendState = BlendStateDescription.SingleAlphaBlend,
             DepthStencilState = new DepthStencilStateDescription(
                 depthTestEnabled: true,
-                depthWriteEnabled: true,
+                depthWriteEnabled: false,
                 comparisonKind: ComparisonKind.LessEqual
             ),
             RasterizerState = RasterizerStateDescription.CullNone,
@@ -77,13 +66,34 @@ public sealed class RectangleDrawable : Drawable<RectangleData>
         _pipeline = factory.CreateGraphicsPipeline(pipelineDescription);
 
         // Resource Set
-        var resourceSetDesc = new ResourceSetDescription(_resourceLayout, [CommonResources.UniformBuffer]);
+        var resourceSetDesc = new ResourceSetDescription(
+            _resourceLayout,
+            CommonResources.UniformBuffer,
+            _fontTexture,
+            CreateMdsfSampler(factory)
+        );
         _resourceSet = factory.CreateResourceSet(resourceSetDesc);
+    }
+
+    private Sampler CreateMdsfSampler(ResourceFactory factory)
+    {
+        var samplerDesc = new SamplerDescription(
+            addressModeU: SamplerAddressMode.Clamp,
+            addressModeV: SamplerAddressMode.Clamp,
+            addressModeW: SamplerAddressMode.Clamp,
+            filter: SamplerFilter.MinLinear_MagLinear_MipLinear,
+            comparisonKind: null,
+            maximumAnisotropy: 0,
+            minimumLod: 0,
+            maximumLod: 8,
+            lodBias: 0,
+            borderColor: SamplerBorderColor.TransparentBlack
+        );
+        return factory.CreateSampler(samplerDesc);
     }
 
     public override void Update(float deltaTime)
     {
-        // Rien à faire pour l'instant
     }
 
     public override void Draw(CommandList commandList)

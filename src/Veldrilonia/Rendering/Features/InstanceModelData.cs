@@ -1,7 +1,7 @@
 using System.Numerics;
 using System.Runtime.InteropServices;
 
-namespace UIFramework.Data;
+namespace Veldridonia.Rendering.Features;
 
 [StructLayout(LayoutKind.Sequential)]
 public struct InstanceModelData(Vector2 position)

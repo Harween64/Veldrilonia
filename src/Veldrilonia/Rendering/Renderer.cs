@@ -1,12 +1,10 @@
-using UIFramework.Core;
-using UIFramework.Data;
-using UIFramework.Rendering.Drawables;
-using UIFramework.Rendering.Drawables.Rectangles;
-using UIFramework.Rendering.Drawables.Text;
-using UIFramework.Rendering.Pipeline;
+using Veldridonia.Core;
+using Veldridonia.Core.Fonts;
+using Veldridonia.Rendering.Features;
+using Veldridonia.Rendering.Pipeline;
 using Veldrid;
 
-namespace UIFramework.Rendering;
+namespace Veldridonia.Rendering;
 
 public class Renderer
 {
@@ -15,10 +13,10 @@ public class Renderer
     private readonly CommonResources _commonResources;
 
     // Drawables
-    public RectangleDrawable Rectangles { get; private set; }
-    public Dictionary<string, TextDrawable> Texts { get; private set; } = [];
+    public RectangleRenderFeature Rectangles { get; private set; }
+    public Dictionary<string, TextRenderFeature> Texts { get; private set; } = [];
 
-    private readonly List<IDrawable> _drawables = [];
+    private readonly List<IRenderFeature> _drawables = [];
 
     public Renderer(GraphicsContext graphicsContext, FontsContext fontsContext)
     {
@@ -26,12 +24,12 @@ public class Renderer
         _fontsContext = fontsContext;
         _commonResources = new CommonResources(graphicsContext.Device);
 
-        Rectangles = new RectangleDrawable(graphicsContext.Device, _commonResources);
+        Rectangles = new RectangleRenderFeature(graphicsContext.Device, _commonResources);
         _drawables.Add(Rectangles);
 
         foreach (var fontName in _fontsContext.LoadedFonts)
         {
-            var textDrawable = new TextDrawable(graphicsContext.Device, _commonResources, _fontsContext.GetFontTexture(fontName));
+            var textDrawable = new TextRenderFeature(graphicsContext.Device, _commonResources, _fontsContext.GetFontTexture(fontName));
             Texts[fontName] = textDrawable;
             _drawables.Add(textDrawable);
         }

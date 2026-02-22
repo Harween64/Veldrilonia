@@ -2,7 +2,7 @@ using Veldrid;
 using Veldrid.Sdl2;
 using Veldrid.StartupUtilities;
 
-namespace UIFramework.Core;
+namespace Veldridonia.Core;
 
 public class Window
 {

@@ -1,9 +1,9 @@
 using System.Numerics;
 using System.Runtime.CompilerServices;
-using UIFramework.Data;
+using Veldridonia.Rendering.Features;
 using Veldrid;
 
-namespace UIFramework.Rendering.Pipeline;
+namespace Veldridonia.Rendering.Pipeline;
 
 public class CommonResources
 {

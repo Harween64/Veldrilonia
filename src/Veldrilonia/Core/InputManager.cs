@@ -1,7 +1,7 @@
 using System.Numerics;
 using Veldrid;
 
-namespace UIFramework.Core;
+namespace Veldridonia.Core;
 
 public class InputManager
 {

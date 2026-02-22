@@ -1,9 +1,10 @@
 using System.Numerics;
 using System.Text.Json;
-using UIFramework.Data;
+using Veldridonia.Core.Fonts.MSDF;
+using Veldridonia.Rendering.Features;
 using Veldrid;
 
-namespace UIFramework.Core;
+namespace Veldridonia.Core.Fonts;
 
 public class FontsContext
 {

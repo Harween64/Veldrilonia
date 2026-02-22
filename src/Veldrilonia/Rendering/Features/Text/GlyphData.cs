@@ -2,7 +2,7 @@ using System.Numerics;
 using System.Runtime.InteropServices;
 using Veldrid;
 
-namespace UIFramework.Data;
+namespace Veldridonia.Rendering.Features;
 
 [StructLayout(LayoutKind.Sequential)]
 public struct GlyphData

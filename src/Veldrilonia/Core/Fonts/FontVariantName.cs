@@ -1,4 +1,4 @@
-namespace UIFramework.Data;
+namespace Veldridonia.Core.Fonts;
 
 public static class FontVariantName
 {

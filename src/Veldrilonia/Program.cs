@@ -1,10 +1,11 @@
 using System.Numerics;
-using UIFramework.Core;
-using UIFramework.Data;
-using UIFramework.Rendering;
+using Veldridonia.Core;
+using Veldridonia.Core.Fonts;
+using Veldridonia.Rendering;
+using Veldridonia.Rendering.Features;
 using Veldrid;
 
-namespace UIFramework;
+namespace Veldridonia;
 
 public class Program
 {

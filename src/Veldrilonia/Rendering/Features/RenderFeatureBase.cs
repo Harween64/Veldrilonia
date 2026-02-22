@@ -1,15 +1,14 @@
 using System.Runtime.CompilerServices;
-using UIFramework.Rendering.Pipeline;
-using UIFramework.Rendering.Shaders;
+using Veldridonia.Rendering.Pipeline;
 using Veldrid;
 
-namespace UIFramework.Rendering.Drawables;
+namespace Veldridonia.Rendering.Features;
 
 /// <summary>
 /// Abstract base class for drawable objects with generic instance data management.
 /// Handles shader loading, pipeline creation, and efficient buffer management.
 /// </summary>
-public abstract class Drawable<T>(GraphicsDevice graphicsDevice, CommonResources commonResources) : IDrawable<T> where T : unmanaged
+public abstract class RenderFeatureBase<T>(GraphicsDevice graphicsDevice, CommonResources commonResources) : IRenderFeature<T> where T : unmanaged
 {
     protected GraphicsDevice GraphicsDevice { get; } = graphicsDevice ?? throw new ArgumentNullException(nameof(graphicsDevice));
     protected CommonResources CommonResources { get; } = commonResources ?? throw new ArgumentNullException(nameof(commonResources));

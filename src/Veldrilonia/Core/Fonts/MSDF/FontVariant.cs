@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace UIFramework.Data;
+namespace Veldridonia.Core.Fonts.MSDF;
 
 public class FontVariant
 {
