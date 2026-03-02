@@ -5,4 +5,5 @@
     <Project Path="libs/veldrid/src/Veldrid.StartupUtilities/Veldrid.StartupUtilities.csproj" />
   </Folder> -->
   <Project DefaultStartup="true" Path="src/Veldrilonia/Veldrilonia.csproj" />
+  <Project Path="src/Veldrilonia.Tests/Veldrilonia.Tests.csproj" />
 </Solution>

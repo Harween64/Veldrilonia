@@ -5,13 +5,7 @@ using Veldridonia.Rendering;
 using Veldridonia.Rendering.Features;
 using Veldrid;
 
-namespace Veldridonia;
-
-public class Program
-{
-    public static void Main(string[] args)
-    {
-        // Initialisation
+// Initialisation
         var window = new Window(960, 960, "Mon Moteur 2D Veldrid");
         var graphicsContext = new GraphicsContext(window);
         var fontsContext = new FontsContext(graphicsContext.Device);
@@ -29,8 +23,8 @@ public class Program
         var instances4 = fontsContext.CreateTextInstances("Fira Code", FontVariantName.Bold, "Fira Code Bold Text!", new Vector2(50, 250), 25.0f);
         var instances5 = fontsContext.CreateTextInstances("Segoe UI", FontVariantName.Italic, "SegoeUI Italic Text!", new Vector2(50, 300), 25.0f);
 
-        var segoeInstances = instances1.Concat(instances3).Concat(instances5).ToArray();
-        var firaInstances = instances2.Concat(instances4).ToArray();
+        GlyphData[] segoeInstances = [..instances1, ..instances3, ..instances5];
+        GlyphData[] firaInstances = [..instances2, ..instances4];
 
         // Mise à jour des données du renderer
         renderer.Texts["Segoe UI"].UpdateInstances(segoeInstances);
@@ -78,42 +72,40 @@ public class Program
 
         // Nettoyage
         renderer.Dispose();
-    }
 
-    static RectangleData[] GenerateRandomRectangles(int windowWidth, int windowHeight, int count)
+static RectangleData[] GenerateRandomRectangles(int windowWidth, int windowHeight, int count)
+{
+    var random = new Random();
+    var rectangles = new RectangleData[count];
+
+    for (int i = 0; i < count; i++)
     {
-        var random = new Random();
-        var rectangles = new RectangleData[count];
-
-        for (int i = 0; i < count; i++)
-        {
-            rectangles[i] = new RectangleData(
-                position: new Vector2(
-                    random.Next(0, windowWidth - 100),
-                    random.Next(0, windowHeight - 100)
-                ),
-                size: new Vector2(
-                    random.Next(10, 100),
-                    random.Next(10, 100)
-                ),
-                color: new RgbaFloat(
-                    r: (float)random.NextDouble(),
-                    g: (float)random.NextDouble(),
-                    b: (float)random.NextDouble(),
-                    a: 1.0f
-                ),
-                cornerRadius: random.Next(0, 10),
-                borderThickness: random.Next(1, 8),
-                borderColor: new RgbaFloat(
-                    r: (float)random.NextDouble(),
-                    g: (float)random.NextDouble(),
-                    b: (float)random.NextDouble(),
-                    a: 1.0f
-                ),
-                depth: (float)random.NextDouble()
-            );
-        }
-
-        return rectangles;
+        rectangles[i] = new RectangleData(
+            position: new Vector2(
+                random.Next(0, windowWidth - 100),
+                random.Next(0, windowHeight - 100)
+            ),
+            size: new Vector2(
+                random.Next(10, 100),
+                random.Next(10, 100)
+            ),
+            color: new RgbaFloat(
+                r: (float)random.NextDouble(),
+                g: (float)random.NextDouble(),
+                b: (float)random.NextDouble(),
+                a: 1.0f
+            ),
+            cornerRadius: random.Next(0, 10),
+            borderThickness: random.Next(1, 8),
+            borderColor: new RgbaFloat(
+                r: (float)random.NextDouble(),
+                g: (float)random.NextDouble(),
+                b: (float)random.NextDouble(),
+                a: 1.0f
+            ),
+            depth: (float)random.NextDouble()
+        );
     }
+
+    return rectangles;
 }
