@@ -98,14 +98,19 @@ Every visual primitive implements `IRenderFeature`:
 ```csharp
 public interface IRenderFeature : IDisposable
 {
-    void Initialize(GraphicsDevice gd, ResourceLayout layout, OutputDescription output);
-    void Update(CommandList cl);
-    void Draw(CommandList cl);
+    void Initialize();
+    void Update(float deltaTime);
+    void Draw(CommandList commandList);
+}
+
+public interface IRenderFeature<TData> : IRenderFeature where TData : struct
+{
+    void UpdateInstances(TData[] data);
 }
 ```
 
 `RenderFeatureBase<T>` (abstract) provides:
-- Typed instance list management (`List<T>`)
+- Typed instance collection management (backed by a `T[]` array)
 - Dynamic GPU instance buffer allocation and upload
 - Shared quad model buffer (unit quad 0→1)
 
@@ -122,7 +127,7 @@ Current features: `TextRenderFeature`, `RectangleRenderFeature`. Add new primiti
 
 - Each font has: `<Name>.ttf`, `<Name>.json` (glyph metrics), `<Name>.png` (atlas)
 - `FontsContext` loads JSON → `FontMetrics` (glyphs, kerning, atlas bounds, variants)
-- `TextRenderFeature.CreateTextInstances()` converts a string into `GlyphData[]` (position, size, UV bounds, color)
+- `FontsContext.CreateTextInstances()` converts a string into `GlyphData[]` (position, size, UV bounds, color)
 - Fragment shader performs multi-channel SDF sampling with adaptive pixel range
 
 ### GPU Memory Layout
@@ -150,7 +155,7 @@ Instanced rendering uses two vertex buffers per feature:
 | Class / public member names | `PascalCase` |
 | Local variables & parameters | `camelCase` |
 | Private fields | `_camelCase` (underscore prefix) |
-| Language | C# 13 with `ImplicitUsings` and `Nullable` enabled |
+| Language | C# 14 with `ImplicitUsings` and `Nullable` enabled |
 | Comments | French (existing codebase) |
 | Math types | `System.Numerics` (`Vector2`, `Vector4`, `Matrix4x4`) |
 | Resource cleanup | `IDisposable` throughout — always dispose pipelines, buffers, textures |
