@@ -59,7 +59,7 @@ public sealed class TextRenderFeature(GraphicsDevice graphicsDevice, CommonResou
                 [modelLayout, instanceLayout],
                 [.. _shaderSet]
             ),
-            Outputs = GraphicsDevice.SwapchainFramebuffer.OutputDescription,
+            Outputs = CommonResources.OutputDescription,
             ResourceLayouts = [_resourceLayout]
         };
 

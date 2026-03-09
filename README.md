@@ -12,19 +12,20 @@ Il a évolué pour intégrer des fonctionnalités de dessin (*Drawable features*
 
 ```text
 veldrilonia/
-├── Veldrilonia.sln           # Solution .NET principale
+├── Veldrilonia.slnx          # Solution .NET principale (nouveau format)
+├── Directory.Packages.props  # Gestion centralisée des packages NuGet
 ├── src/
-│   └── Veldrilonia/          # Projet console .NET
-│       ├── Assets/           # Ressources externes (Polices de texte, Images, etc.)
-│       ├── Core/             # Composants centraux (Window, GraphicsContext, InputManager)
-│       ├── Data/             # Structures et modèles de données (Atlas, Glyph, RectangleData, etc.)
-│       ├── Rendering/        # Moteur graphique et logique de rendu Veldrid
-│       │   ├── Drawables/    # Éléments affichables (Textes, Rectangles)
-│       │   ├── Pipeline/     # Configuration et états des pipelines graphiques
-│       │   ├── Shaders/      # Code des shaders
-│       │   └── Renderer.cs   # Moteur de rendu principal
-│       ├── Veldrilonia.csproj
-│       └── Program.cs        # Point d'entrée de l'application
+│   ├── Veldrilonia/          # Projet principal
+│   │   ├── Assets/           # Ressources externes (Polices de texte, Images, etc.)
+│   │   ├── Core/             # Composants centraux (Window, GraphicsContext, InputManager, Polices)
+│   │   ├── Rendering/        # Moteur graphique et logique de rendu Veldrid
+│   │   │   ├── Features/     # Fonctionnalités de rendu (Rectangles, Textes)
+│   │   │   ├── Pipeline/     # Configuration et états des pipelines graphiques
+│   │   │   └── Renderer.cs   # Moteur de rendu principal
+│   │   ├── Veldrilonia.csproj
+│   │   └── Program.cs        # Point d'entrée de l'application
+│   └── Veldrilonia.Tests/    # Projet de tests unitaires
+├── tools/                    # Outils de build/génération externes (ex: msdf-atlas-gen)
 └── libs/                     # Bibliothèques externes (submodules)
     ├── veldrid/              # Fork de veldrid/veldrid
     └── Avalonia/             # Fork de Harween64/Avalonia

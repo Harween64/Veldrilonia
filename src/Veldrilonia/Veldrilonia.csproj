@@ -14,6 +14,8 @@
   </ItemGroup> -->
 
   <ItemGroup>
+    <PackageReference Include="LibTessDotNet" />
+    <PackageReference Include="Svg" />
     <PackageReference Include="Veldrid" />
     <PackageReference Include="Veldrid.SDL2" />
     <PackageReference Include="Veldrid.SPIRV" />
@@ -23,6 +25,7 @@
 
   <ItemGroup>
     <Content Include="Assets\Fonts\**" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="Assets\Svg\**" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="Rendering\**\*.glsl" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 

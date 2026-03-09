@@ -64,7 +64,7 @@ public sealed class RectangleRenderFeature(GraphicsDevice graphicsDevice, Common
                 [modelLayout, instanceLayout],
                 [.. _shaderSet]
             ),
-            Outputs = GraphicsDevice.SwapchainFramebuffer.OutputDescription,
+            Outputs = CommonResources.OutputDescription,
             ResourceLayouts = [_resourceLayout]
         };
 

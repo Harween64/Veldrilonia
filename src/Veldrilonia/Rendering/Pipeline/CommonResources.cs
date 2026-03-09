@@ -16,9 +16,15 @@ public class CommonResources
     public ushort[] Indices { get; private set; }
     public Vector2[] QuadVertices { get; private set; }
 
-    public CommonResources(GraphicsDevice graphicsDevice)
+    /// <summary>
+    /// OutputDescription du framebuffer MSAA, a utiliser par toutes les features.
+    /// </summary>
+    public OutputDescription OutputDescription { get; }
+
+    public CommonResources(GraphicsDevice graphicsDevice, OutputDescription outputDescription)
     {
         _graphicsDevice = graphicsDevice;
+        OutputDescription = outputDescription;
 
        // Indices pour 2 triangles formant un quad
         Indices = [0, 1, 2, 0, 2, 3];

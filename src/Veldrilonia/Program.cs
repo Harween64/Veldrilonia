@@ -1,6 +1,7 @@
 using System.Numerics;
 using Veldridonia.Core;
 using Veldridonia.Core.Fonts;
+using Veldridonia.Core.Svg;
 using Veldridonia.Rendering;
 using Veldridonia.Rendering.Features;
 using Veldrid;
@@ -16,7 +17,7 @@ using Veldrid;
         renderer.Initialize();
 
         // Génération de données de test
-        //var instances = GenerateRandomRectangles(window.Width, window.Height, 1000);
+        var instances = GenerateRandomRectangles(window.Width, window.Height, 1000);
         var instances1 = fontsContext.CreateTextInstances("Segoe UI", FontVariantName.Regular, "Hello Veldrilonia!", new Vector2(50, 50), 50.0f);
         var instances2 = fontsContext.CreateTextInstances("Fira Code", FontVariantName.Regular, "This is a test of the Veldrid UI Framework.", new Vector2(50, 150), 25.0f);
         var instances3 = fontsContext.CreateTextInstances("Segoe UI", FontVariantName.Bold, "MSDF text rendering with Veldrid!", new Vector2(50, 200), 10.0f);
@@ -25,6 +26,10 @@ using Veldrid;
 
         GlyphData[] segoeInstances = [..instances1, ..instances3, ..instances5];
         GlyphData[] firaInstances = [..instances2, ..instances4];
+
+        // Chargement du SVG
+        var svgMesh = SvgLoader.LoadFromFile("Assets/Svg/sample.svg");
+        renderer.Svg.UpdateMesh(svgMesh);
 
         // Mise à jour des données du renderer
         renderer.Texts["Segoe UI"].UpdateInstances(segoeInstances);
@@ -52,7 +57,7 @@ using Veldrid;
             if (direction != Vector2.Zero)
             {
                 var distanceInGraphicsCoordinates = speed * deltaTime;
-                var distanceInPixels = distanceInGraphicsCoordinates * graphicsContext.PixelsPerUnit;
+                ////var distanceInPixels = distanceInGraphicsCoordinates * graphicsContext.PixelsPerUnit;
                 for (int i = 0; i < segoeInstances.Length; i++)
                 {
                     segoeInstances[i].Position += Vector2.Normalize(direction) * distanceInGraphicsCoordinates;
@@ -61,8 +66,13 @@ using Veldrid;
                 {
                     firaInstances[i].Position += Vector2.Normalize(direction) * distanceInGraphicsCoordinates;
                 }
+                for (int i = 0; i < instances.Length; i++)
+                {
+                    instances[i].Position += Vector2.Normalize(direction) * distanceInGraphicsCoordinates;
+                }
                 renderer.Texts["Segoe UI"].UpdateInstances(segoeInstances);
                 renderer.Texts["Fira Code"].UpdateInstances(firaInstances);
+                renderer.Rectangles.UpdateInstances(instances);
                 //_position += Vector2.Normalize(direction) * distance;
             }
 

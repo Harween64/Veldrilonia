@@ -15,6 +15,7 @@ public class Renderer
     // Drawables
     public RectangleRenderFeature Rectangles { get; private set; }
     public Dictionary<string, TextRenderFeature> Texts { get; private set; } = [];
+    public SvgRenderFeature Svg { get; private set; }
 
     private readonly List<IRenderFeature> _drawables = [];
 
@@ -22,10 +23,13 @@ public class Renderer
     {
         _graphicsContext = graphicsContext;
         _fontsContext = fontsContext;
-        _commonResources = new CommonResources(graphicsContext.Device);
+        _commonResources = new CommonResources(graphicsContext.Device, graphicsContext.MsaaFramebuffer.OutputDescription);
 
         Rectangles = new RectangleRenderFeature(graphicsContext.Device, _commonResources);
         _drawables.Add(Rectangles);
+
+        Svg = new SvgRenderFeature(graphicsContext.Device, _commonResources);
+        _drawables.Add(Svg);
 
         foreach (var fontName in _fontsContext.LoadedFonts)
         {
@@ -53,13 +57,26 @@ public class Renderer
         var commandList = _graphicsContext.CreateCommandList();
 
         commandList.Begin();
-        commandList.SetFramebuffer(_graphicsContext.Device.SwapchainFramebuffer);
+
+        // Rendre dans le framebuffer MSAA
+        commandList.SetFramebuffer(_graphicsContext.MsaaFramebuffer);
         commandList.ClearColorTarget(0, RgbaFloat.White);
         commandList.ClearDepthStencil(1.0f);
 
         foreach (var drawable in _drawables)
         {
             drawable.Draw(commandList);
+        }
+
+        // Resoudre le MSAA vers le backbuffer de la swapchain
+        var swapchainTarget = _graphicsContext.Device.SwapchainFramebuffer.ColorTargets[0].Target;
+        if (_graphicsContext.SampleCount != TextureSampleCount.Count1)
+        {
+            commandList.ResolveTexture(_graphicsContext.MsaaColorTexture, swapchainTarget);
+        }
+        else
+        {
+            commandList.CopyTexture(_graphicsContext.MsaaColorTexture, swapchainTarget);
         }
 
         commandList.End();
